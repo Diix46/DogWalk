@@ -113,12 +113,13 @@ async function handleStartWalk() {
   catch (err: unknown) {
     console.error('Failed to start walk:', err)
     const statusCode = (err as { statusCode?: number })?.statusCode
+      || (err as { response?: { status?: number } })?.response?.status
 
-    // Handle 401 specifically (session expired)
+    // Handle 401 specifically (session expired or not logged in)
     if (statusCode === 401) {
       toast.add({
-        title: 'Session expirée',
-        description: 'Reconnecte-toi pour continuer.',
+        title: 'Connexion requise',
+        description: 'Connecte-toi pour démarrer une balade.',
         icon: 'i-heroicons-user',
         color: 'warning',
       })

@@ -110,6 +110,7 @@ onUnmounted(() => {
 
 // UI State
 const isFinishing = ref(false)
+const showCancelConfirm = ref(false)
 const showDeviationAlert = ref(false)
 const deviationAlertDismissed = ref(false)
 const isOnline = ref(true)
@@ -216,9 +217,12 @@ async function handleFinishWalk() {
 /**
  * Handle cancelling the walk
  */
-async function handleCancelWalk() {
-  if (!confirm('Annuler la balade ?')) return
+function promptCancelWalk() {
+  showCancelConfirm.value = true
+}
 
+async function handleCancelWalk() {
+  showCancelConfirm.value = false
   stopTracking()
 
   try {
@@ -301,7 +305,7 @@ useSeoMeta({
           color="neutral"
           size="sm"
           icon="i-heroicons-x-mark"
-          @click="handleCancelWalk"
+          @click="promptCancelWalk"
         >
           Annuler
         </UButton>
@@ -421,6 +425,42 @@ useSeoMeta({
         </UButton>
       </div>
     </template>
+
+    <!-- Cancel Confirmation Modal -->
+    <Teleport to="body">
+      <div
+        v-if="showCancelConfirm"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+        @click.self="showCancelConfirm = false"
+      >
+        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-4">
+          <div class="text-center">
+            <div class="w-12 h-12 bg-error/10 rounded-full flex items-center justify-center mx-auto mb-3">
+              <UIcon name="i-heroicons-exclamation-triangle" class="w-6 h-6 text-error" />
+            </div>
+            <h3 class="text-lg font-semibold text-neutral-900">Annuler la balade ?</h3>
+            <p class="text-sm text-neutral-500 mt-1">Ta progression ne sera pas enregistrée.</p>
+          </div>
+          <div class="flex gap-3">
+            <UButton
+              block
+              variant="outline"
+              color="neutral"
+              @click="showCancelConfirm = false"
+            >
+              Continuer
+            </UButton>
+            <UButton
+              block
+              color="error"
+              @click="handleCancelWalk"
+            >
+              Annuler
+            </UButton>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
