@@ -1,0 +1,37 @@
+{
+  "name": "dogwalk",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "typecheck": "nuxt typecheck",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "wrangler d1 migrations apply dogwalk-db --local",
+    "db:migrate:prod": "wrangler d1 migrations apply dogwalk-db --remote",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@noble/hashes": "^2.0.1",
+    "@nuxt/ui": "^4.4.0",
+    "@nuxthub/core": "^0.10.5",
+    "drizzle-orm": "^0.45.1",
+    "maplibre-gl": "^5.17.0",
+    "nuxt": "^4.0.0",
+    "nuxt-auth-utils": "^0.5.28",
+    "vue": "^3.5.0",
+    "vue-router": "^4.5.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@libsql/client": "^0.17.0",
+    "drizzle-kit": "^0.31.8",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.7.0",
+    "vue-tsc": "^2.2.0",
+    "wrangler": "^4.61.0"
+  }
+}

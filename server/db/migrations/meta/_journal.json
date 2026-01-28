@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1769592104869,
+      "tag": "0000_minor_lily_hollister",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1769596378799,
+      "tag": "0001_ambiguous_iron_patriot",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1769597490787,
+      "tag": "0002_open_harrier",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1769612257567,
+      "tag": "0003_yellow_ultimo",
+      "breakpoints": true
+    }
+  ]
+}
