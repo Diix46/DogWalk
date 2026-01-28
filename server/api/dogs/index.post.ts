@@ -31,17 +31,19 @@ export default defineEventHandler(async (event) => {
   const now = Math.floor(Date.now() / 1000)
 
   try {
-    // Use raw SQL to avoid Drizzle inserting null for id
-    const insertResult = await useDB().run(sql`
+    // Use raw SQL for insert, then fetch by max id for this user
+    await useDB().run(sql`
       INSERT INTO dogs (user_id, name, breed, birth_date, created_at, updated_at)
       VALUES (${session.user.id}, ${name}, ${breed || null}, ${birth_date || null}, ${now}, ${now})
     `)
 
-    // Fetch the created dog
+    // Fetch the just-created dog (latest for this user)
     const [newDog] = await useDB()
       .select()
       .from(dogs)
-      .where(sql`id = ${insertResult.lastInsertRowid}`)
+      .where(sql`user_id = ${session.user.id}`)
+      .orderBy(sql`id DESC`)
+      .limit(1)
 
     return newDog
   }
