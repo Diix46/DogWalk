@@ -62,13 +62,23 @@ export default defineEventHandler(async (event) => {
   catch (error: unknown) {
     // Handle UNIQUE constraint violation (email already exists)
     const errorMessage = error instanceof Error ? error.message : String(error)
-    if (errorMessage.includes('UNIQUE constraint failed') || errorMessage.includes('unique')) {
+    if (
+      errorMessage.includes('UNIQUE constraint failed')
+      || errorMessage.includes('unique')
+      || errorMessage.includes('UNIQUE')
+      || errorMessage.includes('already exists')
+      || errorMessage.includes('duplicate')
+    ) {
       throw createError({
         statusCode: 409,
         statusMessage: 'Cet email est déjà utilisé',
       })
     }
-    // Re-throw unexpected errors
-    throw error
+    // Re-throw as proper HTTP error to avoid generic 500
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Erreur lors de la création du compte',
+      message: errorMessage,
+    })
   }
 })
