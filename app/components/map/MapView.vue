@@ -31,8 +31,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  center: () => [2.3522, 48.8566], // Paris
-  zoom: 12,
+  center: () => [1.3370, 43.5185], // Villeneuve-Tolosane
+  zoom: 13,
   route: null,
   showUserPosition: false,
   height: '400px',

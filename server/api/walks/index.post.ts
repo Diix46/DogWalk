@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { sql } from 'drizzle-orm'
+import { sql, eq, and } from 'drizzle-orm'
 import { walks, routes } from '../../db/schema'
 
 const createWalkSchema = z.object({
@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
   const [route] = await db
     .select()
     .from(routes)
-    .where(sql`id = ${route_id} AND is_active = 1`)
+    .where(and(eq(routes.id, route_id), eq(routes.is_active, true)))
 
   if (!route) {
     throw createError({
@@ -40,18 +40,20 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const now = Math.floor(Date.now() / 1000)
+    const now = new Date()
 
-    const insertResult = await db.run(sql`
-      INSERT INTO walks (user_id, route_id, started_at, distance_meters, duration_seconds, status, created_at)
-      VALUES (${session.user.id}, ${route_id}, ${now}, 0, 0, 'active', ${now})
-    `)
-
-    // Fetch the created walk
     const [newWalk] = await db
-      .select()
-      .from(walks)
-      .where(sql`id = ${insertResult.lastInsertRowid}`)
+      .insert(walks)
+      .values({
+        user_id: session.user.id,
+        route_id,
+        started_at: now,
+        distance_meters: 0,
+        duration_seconds: 0,
+        status: 'active',
+        created_at: now,
+      })
+      .returning()
 
     return newWalk
   }

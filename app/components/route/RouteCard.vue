@@ -156,7 +156,7 @@ const ariaLabel = computed(() => {
     <!-- Card Content -->
     <div class="flex flex-col gap-3">
       <!-- Route Name -->
-      <h3 class="text-lg font-semibold text-neutral-900 pr-20 line-clamp-2">
+      <h3 class="text-lg font-semibold text-neutral-900 line-clamp-2">
         {{ route.name }}
       </h3>
 
