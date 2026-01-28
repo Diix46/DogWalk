@@ -30,7 +30,7 @@ interface OpenWeatherForecastResponse {
 }
 
 export async function fetchForecastFromAPI(lat: number, lng: number) {
-  const apiKey = process.env.WEATHER_API_KEY || useRuntimeConfig().weatherApiKey
+  const apiKey = useRuntimeConfig().weatherApiKey
   if (!apiKey) {
     throw new Error('WEATHER_API_KEY not configured')
   }
@@ -55,7 +55,7 @@ export async function fetchForecastFromAPI(lat: number, lng: number) {
 }
 
 export async function fetchWeatherFromAPI(lat: number, lng: number) {
-  const apiKey = process.env.WEATHER_API_KEY || useRuntimeConfig().weatherApiKey
+  const apiKey = useRuntimeConfig().weatherApiKey
   if (!apiKey) {
     throw new Error('WEATHER_API_KEY not configured')
   }
