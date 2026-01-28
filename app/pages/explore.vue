@@ -341,7 +341,7 @@ useSeoMeta({
         <!-- Route Cards Grid -->
         <div
           v-else-if="routes && routes.length > 0"
-          class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
+          class="grid grid-cols-1 sm:grid-cols-2 gap-4"
         >
           <RouteCard
             v-for="(route, index) in routes"
@@ -382,10 +382,10 @@ useSeoMeta({
       </section>
 
       <!-- Map Section (right on desktop, sticky) -->
-      <section aria-labelledby="map-heading" class="lg:w-[420px] xl:w-[480px] lg:flex-shrink-0 lg:order-2 lg:sticky lg:top-8 lg:self-start">
+      <section aria-labelledby="map-heading" class="lg:w-[45%] xl:w-[50%] lg:flex-shrink-0 lg:order-2 lg:sticky lg:top-8 lg:self-start">
         <h2 id="map-heading" class="sr-only">Carte des parcours</h2>
         <MapView
-          :height="'50vh'"
+          :height="'65vh'"
           class="lg:rounded-xl lg:overflow-hidden lg:shadow-card"
           :show-user-position="true"
           @ready="onMapReady"

@@ -55,7 +55,7 @@ function isActive(to: string) {
 
       <!-- Main content -->
       <main class="flex-1 lg:ml-64">
-        <div class="px-4 py-6 pb-24 lg:pb-10 lg:px-8 xl:px-12 lg:py-8 max-w-5xl mx-auto">
+        <div class="px-4 py-6 pb-24 lg:pb-10 lg:px-8 xl:px-12 lg:py-8 max-w-7xl mx-auto">
           <slot />
         </div>
       </main>
