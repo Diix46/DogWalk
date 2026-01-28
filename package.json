@@ -15,7 +15,6 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@noble/hashes": "^2.0.1",
     "@nuxt/ui": "^4.4.0",
     "@nuxthub/core": "^0.10.5",
     "drizzle-orm": "^0.45.1",
