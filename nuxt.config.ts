@@ -19,6 +19,10 @@ export default defineNuxtConfig({
     }
   },
 
+  runtimeConfig: {
+    weatherApiKey: process.env.WEATHER_API_KEY || '',
+  },
+
   css: ['~/assets/css/main.css'],
 
   // Cloudflare Pages deployment

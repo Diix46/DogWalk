@@ -15,12 +15,24 @@ const routeId = computed(() => route.params.id as string)
 const toast = useToast()
 const { loggedIn } = useUserSession()
 
+// Weather integration (Story 5.4)
+const { weather, isLoading: weatherLoading, fetchWeather } = useWeather()
+
 /**
  * Fetch route data
  */
 const { data: routeData, status, error } = useFetch<Route>(() => `/api/routes/${routeId.value}`, {
   watch: [routeId],
 })
+
+// Fetch weather when route data is available
+watch(routeData, (data) => {
+  if (data) {
+    const lat = data.center_lat ?? 43.5185
+    const lng = data.center_lng ?? 1.3370
+    fetchWeather(lat, lng)
+  }
+}, { immediate: true })
 
 /**
  * Loading state
@@ -287,20 +299,21 @@ useSeoMeta({
       class="fixed bottom-16 left-0 right-0 p-4 bg-white/95 backdrop-blur border-t border-neutral-200"
     >
       <div class="max-w-lg mx-auto">
-        <!-- Can Start: Show start button -->
-        <UButton
-          v-if="canStart"
-          block
-          color="primary"
-          size="lg"
-          class="text-lg font-semibold"
-          :loading="isStartingWalk"
-          :disabled="isStartingWalk"
-          @click="handleStartWalk"
-        >
-          <UIcon v-if="!isStartingWalk" name="i-heroicons-play" class="w-5 h-5 mr-2" />
-          {{ isStartingWalk ? 'Démarrage...' : "C'est parti !" }}
-        </UButton>
+        <!-- Weather + Start button row (Story 5.4) -->
+        <div v-if="canStart" class="flex items-center gap-3">
+          <WeatherBadge v-if="weather || weatherLoading" :weather="weather" variant="compact" :lat="routeData?.center_lat ?? 43.5185" :lng="routeData?.center_lng ?? 1.3370" />
+          <UButton
+            class="flex-1 text-lg font-semibold"
+            color="primary"
+            size="lg"
+            :loading="isStartingWalk"
+            :disabled="isStartingWalk"
+            @click="handleStartWalk"
+          >
+            <UIcon v-if="!isStartingWalk" name="i-heroicons-play" class="w-5 h-5 mr-2" />
+            {{ isStartingWalk ? 'Démarrage...' : "C'est parti !" }}
+          </UButton>
+        </div>
 
         <!-- Premium Route for non-premium user: Show upgrade prompt -->
         <div v-else class="text-center space-y-2">

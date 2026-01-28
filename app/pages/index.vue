@@ -6,6 +6,19 @@ const userName = computed(() => (user.value as { name?: string | null } | null)?
 // TimeSelector state
 const selectedDuration = ref<number>()
 
+// Weather integration (Story 5.3, 5.5)
+const { coords, getCurrentPosition } = useGeolocation()
+const { weather, isLoading: weatherLoading, fetchWeather } = useWeather()
+const weatherLat = ref(43.5185)
+const weatherLng = ref(1.3370)
+
+onMounted(async () => {
+  await getCurrentPosition()
+  weatherLat.value = coords.value?.lat ?? 43.5185
+  weatherLng.value = coords.value?.lng ?? 1.3370
+  fetchWeather(weatherLat.value, weatherLng.value)
+})
+
 /**
  * Handle time selection - navigate to explore with duration filter
  */
@@ -29,6 +42,15 @@ function onDurationSelect(minutes: number) {
       <p class="text-neutral-600 lg:text-lg lg:max-w-xl lg:mx-auto">
         {{ loggedIn ? 'Prêt pour une balade ?' : "L'app qui rend les balades avec ton chien plus simples et plus fun !" }}
       </p>
+
+      <!-- Weather Badge (Story 5.3) -->
+      <div class="flex justify-center mt-4">
+        <div v-if="weatherLoading" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-neutral-100 text-neutral-400 text-xs animate-pulse min-h-[44px]">
+          <span>☁️</span>
+          <span>Chargement...</span>
+        </div>
+        <WeatherBadge v-else :weather="weather" variant="full" :lat="weatherLat" :lng="weatherLng" />
+      </div>
     </div>
 
     <!-- TimeSelector - "J'ai X minutes" interaction -->
