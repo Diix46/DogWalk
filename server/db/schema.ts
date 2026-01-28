@@ -5,6 +5,8 @@ export const users = sqliteTable('users', {
   email: text('email').notNull().unique(),
   password_hash: text('password_hash').notNull(),
   name: text('name'),
+  streak_count: integer('streak_count').notNull().default(0),
+  last_walk_date: text('last_walk_date'), // YYYY-MM-DD
   created_at: integer('created_at', { mode: 'timestamp' })
     .notNull()
     .$defaultFn(() => new Date()),

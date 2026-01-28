@@ -6,6 +6,14 @@ const userName = computed(() => (user.value as { name?: string | null } | null)?
 // TimeSelector state
 const selectedDuration = ref<number>()
 
+// Walk stats (Story 6.3)
+interface WalkStats {
+  totalWalks: number
+  totalDistance: number
+  totalDuration: number
+}
+const { data: stats } = loggedIn.value ? useFetch<WalkStats>('/api/walks/stats') : { data: ref(null) }
+
 // Weather integration (Story 5.3, 5.5)
 const { coords, getCurrentPosition } = useGeolocation()
 const { weather, isLoading: weatherLoading, fetchWeather } = useWeather()
@@ -88,13 +96,13 @@ function onDurationSelect(minutes: number) {
     <div v-else class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
       <UCard>
         <div class="text-center py-2 lg:py-4">
-          <p class="text-2xl lg:text-3xl font-bold text-primary">0</p>
+          <p class="text-2xl lg:text-3xl font-bold text-primary">{{ stats?.totalWalks ?? 0 }}</p>
           <p class="text-sm text-neutral-600">Balades</p>
         </div>
       </UCard>
       <UCard>
         <div class="text-center py-2 lg:py-4">
-          <p class="text-2xl lg:text-3xl font-bold text-primary">0 km</p>
+          <p class="text-2xl lg:text-3xl font-bold text-primary">{{ stats ? ((stats.totalDistance / 1000).toFixed(1) + ' km') : '0 km' }}</p>
           <p class="text-sm text-neutral-600">Parcourus</p>
         </div>
       </UCard>
@@ -106,7 +114,7 @@ function onDurationSelect(minutes: number) {
       </UCard>
       <UCard class="hidden lg:block">
         <div class="text-center py-4">
-          <p class="text-3xl font-bold text-primary">0h</p>
+          <p class="text-2xl lg:text-3xl font-bold text-primary">{{ stats ? Math.floor(stats.totalDuration / 3600) + 'h' : '0h' }}</p>
           <p class="text-sm text-neutral-600">Temps total</p>
         </div>
       </UCard>

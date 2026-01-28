@@ -16,6 +16,30 @@ const toast = useToast()
 const userEmail = computed(() => (user.value as { email?: string } | null)?.email)
 const userName = computed(() => (user.value as { name?: string | null } | null)?.name)
 
+// Fetch walking stats
+interface WalkStats {
+  totalWalks: number
+  totalDistance: number
+  totalDuration: number
+}
+const { data: stats } = await useFetch<WalkStats>('/api/walks/stats')
+
+const formattedWalks = computed(() => {
+  const n = stats.value?.totalWalks ?? 0
+  return n === 0 ? '0' : String(n)
+})
+const formattedDistance = computed(() => {
+  const m = stats.value?.totalDistance ?? 0
+  return m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${m} m`
+})
+const formattedDuration = computed(() => {
+  const s = stats.value?.totalDuration ?? 0
+  const h = Math.floor(s / 3600)
+  const min = Math.floor((s % 3600) / 60)
+  if (h > 0) return `${h}h${min > 0 ? min.toString().padStart(2, '0') : ''}`
+  return `${min} min`
+})
+
 // Fetch user's dogs
 const { data: dogs, refresh: refreshDogs } = await useFetch<Dog[]>('/api/dogs')
 
@@ -141,6 +165,40 @@ async function logout() {
         </div>
       </UCard>
     </div>
+
+    <!-- Streak -->
+    <WalkStreakDisplay />
+
+    <!-- Stats this month -->
+    <UCard>
+      <template #header>
+        <h2 class="font-semibold text-neutral-900">Ce mois-ci</h2>
+      </template>
+      <div class="grid grid-cols-3 gap-4 text-center">
+        <div>
+          <p class="text-2xl font-bold text-primary">{{ formattedWalks }}</p>
+          <p class="text-sm text-neutral-600">{{ (stats?.totalWalks ?? 0) <= 1 ? 'Balade' : 'Balades' }}</p>
+        </div>
+        <div>
+          <p class="text-2xl font-bold text-primary">{{ formattedDistance }}</p>
+          <p class="text-sm text-neutral-600">Parcourus</p>
+        </div>
+        <div>
+          <p class="text-2xl font-bold text-primary">{{ formattedDuration }}</p>
+          <p class="text-sm text-neutral-600">Durée totale</p>
+        </div>
+      </div>
+    </UCard>
+
+    <!-- History link -->
+    <UButton
+      to="/profile/history"
+      variant="soft"
+      block
+      icon="i-heroicons-clock"
+    >
+      Mon historique de balades
+    </UButton>
 
     <UButton
       color="error"

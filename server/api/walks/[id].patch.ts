@@ -104,6 +104,13 @@ export default defineEventHandler(async (event) => {
       .where(and(eq(walks.id, Number(id)), eq(walks.user_id, session.user.id)))
       .returning()
 
+    // Update streak when walk is completed (Story 6.5)
+    if (status === 'completed') {
+      updateUserStreak(session.user.id).catch((err) => {
+        console.error('Streak update error:', err instanceof Error ? err.message : String(err))
+      })
+    }
+
     return updatedWalk
   }
   catch (error) {
