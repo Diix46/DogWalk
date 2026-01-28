@@ -27,6 +27,11 @@ const {
   getCurrentPosition,
 } = useGeolocation()
 
+// Weather for explore page
+const { weather, isLoading: weatherLoading, fetchWeather } = useWeather()
+const weatherLat = ref(43.5185)
+const weatherLng = ref(1.3370)
+
 // Track if user has dismissed the location banner
 const locationBannerDismissed = ref(false)
 
@@ -172,8 +177,13 @@ onMounted(() => {
 
   // Request geolocation on mount (Story 3.6)
   if (isGeoSupported) {
-    getCurrentPosition()
+    await getCurrentPosition()
+    if (userCoords.value) {
+      weatherLat.value = userCoords.value.lat
+      weatherLng.value = userCoords.value.lng
+    }
   }
+  fetchWeather(weatherLat.value, weatherLng.value)
 })
 
 /**
@@ -229,14 +239,17 @@ useSeoMeta({
         </p>
       </div>
 
-      <!-- Back to home -->
-      <UButton
-        to="/"
-        variant="ghost"
-        icon="i-heroicons-arrow-left"
-        aria-label="Retour à l'accueil"
-        class="lg:hidden"
-      />
+      <div class="flex items-center gap-3">
+        <WeatherBadge v-if="weather || weatherLoading" :weather="weather" variant="full" :lat="weatherLat" :lng="weatherLng" />
+        <!-- Back to home -->
+        <UButton
+          to="/"
+          variant="ghost"
+          icon="i-heroicons-arrow-left"
+          aria-label="Retour à l'accueil"
+          class="lg:hidden"
+        />
+      </div>
     </div>
 
     <!-- Location Permission Banner (Story 3.6 - AC#4) -->

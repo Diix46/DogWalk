@@ -113,9 +113,10 @@ async function toggleDetails() {
       <template v-if="variant === 'full'">
         <template v-if="isAvailable && weather?.temperature !== undefined">
           <span class="font-semibold">{{ weather.temperature }}°C</span>
+          <span v-if="weather.description" class="hidden sm:inline capitalize">· {{ weather.description }}</span>
         </template>
         <template v-else>
-          <span class="text-neutral-400">N/A</span>
+          <span>Météo indisponible</span>
         </template>
       </template>
     </button>
