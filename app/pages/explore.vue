@@ -177,13 +177,17 @@ onMounted(() => {
 
   // Request geolocation on mount (Story 3.6)
   if (isGeoSupported) {
-    await getCurrentPosition()
-    if (userCoords.value) {
-      weatherLat.value = userCoords.value.lat
-      weatherLng.value = userCoords.value.lng
-    }
+    getCurrentPosition().then(() => {
+      if (userCoords.value) {
+        weatherLat.value = userCoords.value.lat
+        weatherLng.value = userCoords.value.lng
+      }
+      fetchWeather(weatherLat.value, weatherLng.value)
+    })
   }
-  fetchWeather(weatherLat.value, weatherLng.value)
+  else {
+    fetchWeather(weatherLat.value, weatherLng.value)
+  }
 })
 
 /**
