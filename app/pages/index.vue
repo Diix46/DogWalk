@@ -20,25 +20,25 @@ function onDurationSelect(minutes: number) {
 </script>
 
 <template>
-  <div class="space-y-8">
-    <!-- Welcome Section -->
-    <div class="text-center pt-4">
-      <h1 class="text-3xl font-bold text-primary mb-2">
+  <div class="space-y-8 lg:space-y-12">
+    <!-- Welcome / Hero Section -->
+    <div class="text-center pt-4 lg:pt-8 lg:pb-4">
+      <h1 class="text-3xl lg:text-5xl font-bold text-primary mb-2 lg:mb-4 tracking-tight">
         {{ loggedIn ? `Salut ${userName || 'toi'} !` : 'Bienvenue sur DogWalk' }}
       </h1>
-      <p class="text-neutral-600">
+      <p class="text-neutral-600 lg:text-lg lg:max-w-xl lg:mx-auto">
         {{ loggedIn ? 'Prêt pour une balade ?' : "L'app qui rend les balades avec ton chien plus simples et plus fun !" }}
       </p>
     </div>
 
     <!-- TimeSelector - "J'ai X minutes" interaction -->
-    <UCard class="text-center">
-      <div class="py-6 space-y-4">
-        <UIcon name="i-heroicons-clock" class="w-12 h-12 text-primary-500 mx-auto" />
-        <h2 class="text-xl font-semibold text-neutral-900">
+    <UCard class="text-center lg:max-w-2xl lg:mx-auto">
+      <div class="py-6 lg:py-10 space-y-4 lg:space-y-6">
+        <UIcon name="i-heroicons-clock" class="w-12 h-12 lg:w-16 lg:h-16 text-primary-500 mx-auto" />
+        <h2 class="text-xl lg:text-2xl font-semibold text-neutral-900">
           Combien de temps as-tu ?
         </h2>
-        <p class="text-neutral-600 text-sm">
+        <p class="text-neutral-600 text-sm lg:text-base">
           Choisis ta durée et découvre des parcours adaptés.
         </p>
 
@@ -53,7 +53,7 @@ function onDurationSelect(minutes: number) {
     </UCard>
 
     <!-- Auth Actions (if not logged in) -->
-    <div v-if="!loggedIn" class="space-y-3">
+    <div v-if="!loggedIn" class="space-y-3 lg:max-w-md lg:mx-auto">
       <UButton to="/register" block size="lg">
         Créer un compte gratuit
       </UButton>
@@ -63,17 +63,29 @@ function onDurationSelect(minutes: number) {
     </div>
 
     <!-- Quick Stats (if logged in) -->
-    <div v-else class="grid grid-cols-2 gap-4">
+    <div v-else class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
       <UCard>
-        <div class="text-center py-2">
-          <p class="text-2xl font-bold text-primary">0</p>
+        <div class="text-center py-2 lg:py-4">
+          <p class="text-2xl lg:text-3xl font-bold text-primary">0</p>
           <p class="text-sm text-neutral-600">Balades</p>
         </div>
       </UCard>
       <UCard>
-        <div class="text-center py-2">
-          <p class="text-2xl font-bold text-primary">0 km</p>
+        <div class="text-center py-2 lg:py-4">
+          <p class="text-2xl lg:text-3xl font-bold text-primary">0 km</p>
           <p class="text-sm text-neutral-600">Parcourus</p>
+        </div>
+      </UCard>
+      <UCard class="hidden lg:block">
+        <div class="text-center py-4">
+          <p class="text-3xl font-bold text-primary">0</p>
+          <p class="text-sm text-neutral-600">Parcours favoris</p>
+        </div>
+      </UCard>
+      <UCard class="hidden lg:block">
+        <div class="text-center py-4">
+          <p class="text-3xl font-bold text-primary">0h</p>
+          <p class="text-sm text-neutral-600">Temps total</p>
         </div>
       </UCard>
     </div>

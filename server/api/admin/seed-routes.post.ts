@@ -3,10 +3,13 @@ import { sampleRoutes } from '../../db/seed-routes'
 import { sql } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
-  // TODO: restore production guard after initial seed
-  // if (process.env.NODE_ENV === 'production') {
-  //   throw createError({ statusCode: 403, statusMessage: 'Seed not allowed in production' })
-  // }
+  // Only allow in development
+  if (process.env.NODE_ENV === 'production') {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Seed not allowed in production',
+    })
+  }
 
   // TODO: Add admin authentication check when auth system supports roles
   // const session = await getUserSession(event)

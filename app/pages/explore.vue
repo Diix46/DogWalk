@@ -220,11 +220,11 @@ useSeoMeta({
     <!-- Header with duration filter -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-neutral-900">Explorer</h1>
-        <p v-if="selectedDuration" class="text-neutral-600 text-sm">
+        <h1 class="text-2xl lg:text-3xl font-bold text-neutral-900">Explorer</h1>
+        <p v-if="selectedDuration" class="text-neutral-600 text-sm lg:text-base">
           Parcours de {{ selectedDuration >= 60 ? '1h+' : `${selectedDuration} min` }}
         </p>
-        <p v-else class="text-neutral-600 text-sm">
+        <p v-else class="text-neutral-600 text-sm lg:text-base">
           Tous les parcours disponibles
         </p>
       </div>
@@ -235,6 +235,7 @@ useSeoMeta({
         variant="ghost"
         icon="i-heroicons-arrow-left"
         aria-label="Retour à l'accueil"
+        class="lg:hidden"
       />
     </div>
 
@@ -257,133 +258,140 @@ useSeoMeta({
       />
     </div>
 
-    <!-- TimeSelector for filtering on explore page (AC#4) -->
-    <section aria-label="Filtrer par durée">
-      <TimeSelector
-        :model-value="selectedDuration"
-        @update:model-value="onDurationSelect"
-      />
-    </section>
-
-    <!-- Type Filter Chips (Story 3.7) -->
-    <section aria-label="Filtrer par type" class="space-y-2">
-      <div class="flex gap-2 flex-wrap">
-        <UButton
-          v-for="filter in typeFilters"
-          :key="filter.value"
-          :variant="selectedType === filter.value ? 'solid' : 'outline'"
-          :color="selectedType === filter.value ? 'primary' : 'neutral'"
-          size="sm"
-          class="rounded-full"
-          @click="toggleTypeFilter(filter.value)"
-        >
-          <UIcon :name="filter.icon" class="w-4 h-4 mr-1" />
-          {{ filter.label }}
-        </UButton>
-      </div>
-
-      <!-- Clear all filters button -->
-      <UButton
-        v-if="hasActiveFilters"
-        variant="ghost"
-        size="sm"
-        @click="clearAllFilters"
-      >
-        Effacer les filtres
-      </UButton>
-    </section>
-
-    <!-- Map Section -->
-    <section aria-labelledby="map-heading">
-      <h2 id="map-heading" class="sr-only">Carte des parcours</h2>
-      <MapView
-        height="50vh"
-        :show-user-position="true"
-        @ready="onMapReady"
-      />
-    </section>
-
-    <!-- Routes List -->
-    <section aria-labelledby="routes-heading" class="space-y-4">
-      <h2 id="routes-heading" class="text-lg font-semibold text-neutral-900">
-        Parcours recommandés
-      </h2>
-
-      <!-- Loading State -->
-      <div
-        v-if="isLoading"
-        class="text-center py-8"
-      >
-        <UIcon
-          name="i-heroicons-arrow-path"
-          class="w-8 h-8 text-primary animate-spin mx-auto mb-3"
+    <!-- Filters section -->
+    <div class="lg:flex lg:items-start lg:gap-6">
+      <!-- TimeSelector for filtering on explore page (AC#4) -->
+      <section aria-label="Filtrer par durée" class="lg:flex-shrink-0">
+        <TimeSelector
+          :model-value="selectedDuration"
+          @update:model-value="onDurationSelect"
         />
-        <p class="text-neutral-600">Chargement des parcours...</p>
-      </div>
+      </section>
 
-      <!-- Error State -->
-      <div
-        v-else-if="error"
-        class="text-center py-8"
-      >
-        <UIcon
-          name="i-heroicons-exclamation-triangle"
-          class="w-12 h-12 text-warning mx-auto mb-3"
-        />
-        <p class="text-neutral-600">
-          Impossible de charger les parcours.
-        </p>
-        <UButton
-          variant="outline"
-          class="mt-4"
-          @click="() => refresh()"
-        >
-          Réessayer
-        </UButton>
-      </div>
+      <!-- Type Filter Chips (Story 3.7) -->
+      <section aria-label="Filtrer par type" class="space-y-2 mt-4 lg:mt-0">
+        <div class="flex gap-2 flex-wrap">
+          <UButton
+            v-for="filter in typeFilters"
+            :key="filter.value"
+            :variant="selectedType === filter.value ? 'solid' : 'outline'"
+            :color="selectedType === filter.value ? 'primary' : 'neutral'"
+            size="sm"
+            class="rounded-full"
+            @click="toggleTypeFilter(filter.value)"
+          >
+            <UIcon :name="filter.icon" class="w-4 h-4 mr-1" />
+            {{ filter.label }}
+          </UButton>
+        </div>
 
-      <!-- Route Cards Grid -->
-      <div
-        v-else-if="routes && routes.length > 0"
-        class="grid grid-cols-1 md:grid-cols-2 gap-4"
-      >
-        <RouteCard
-          v-for="(route, index) in routes"
-          :key="route.id"
-          :route="route"
-          :class="[
-            isMounted && 'motion-safe:animate-fade-in-up',
-          ]"
-          :style="{ animationDelay: `${index * 100}ms` }"
-          @click="onRouteClick"
-        />
-      </div>
-
-      <!-- Empty State (AC#2, Story 3.7 AC#6) -->
-      <div
-        v-else
-        class="text-center py-8"
-      >
-        <UIcon
-          name="i-heroicons-map"
-          class="w-12 h-12 text-neutral-400 mx-auto mb-3"
-        />
-        <p class="text-neutral-600 font-medium">
-          Aucun parcours trouvé... pour l'instant !
-        </p>
-        <p class="text-neutral-500 text-sm mt-1">
-          Essayez d'autres filtres ou explorez tous les parcours.
-        </p>
+        <!-- Clear all filters button -->
         <UButton
           v-if="hasActiveFilters"
-          variant="outline"
-          class="mt-4"
+          variant="ghost"
+          size="sm"
           @click="clearAllFilters"
         >
-          Voir tous les parcours
+          Effacer les filtres
         </UButton>
-      </div>
-    </section>
+      </section>
+    </div>
+
+    <!-- Desktop: side-by-side layout for map + routes -->
+    <div class="lg:flex lg:gap-8">
+      <!-- Routes List (left on desktop) -->
+      <section aria-labelledby="routes-heading" class="space-y-4 lg:flex-1 lg:min-w-0 lg:order-1">
+        <h2 id="routes-heading" class="text-lg lg:text-xl font-semibold text-neutral-900">
+          Parcours recommandés
+        </h2>
+
+        <!-- Loading State -->
+        <div
+          v-if="isLoading"
+          class="text-center py-8"
+        >
+          <UIcon
+            name="i-heroicons-arrow-path"
+            class="w-8 h-8 text-primary animate-spin mx-auto mb-3"
+          />
+          <p class="text-neutral-600">Chargement des parcours...</p>
+        </div>
+
+        <!-- Error State -->
+        <div
+          v-else-if="error"
+          class="text-center py-8"
+        >
+          <UIcon
+            name="i-heroicons-exclamation-triangle"
+            class="w-12 h-12 text-warning mx-auto mb-3"
+          />
+          <p class="text-neutral-600">
+            Impossible de charger les parcours.
+          </p>
+          <UButton
+            variant="outline"
+            class="mt-4"
+            @click="() => refresh()"
+          >
+            Réessayer
+          </UButton>
+        </div>
+
+        <!-- Route Cards Grid -->
+        <div
+          v-else-if="routes && routes.length > 0"
+          class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
+        >
+          <RouteCard
+            v-for="(route, index) in routes"
+            :key="route.id"
+            :route="route"
+            :class="[
+              isMounted && 'motion-safe:animate-fade-in-up',
+            ]"
+            :style="{ animationDelay: `${index * 100}ms` }"
+            @click="onRouteClick"
+          />
+        </div>
+
+        <!-- Empty State (AC#2, Story 3.7 AC#6) -->
+        <div
+          v-else
+          class="text-center py-8"
+        >
+          <UIcon
+            name="i-heroicons-map"
+            class="w-12 h-12 text-neutral-400 mx-auto mb-3"
+          />
+          <p class="text-neutral-600 font-medium">
+            Aucun parcours trouvé... pour l'instant !
+          </p>
+          <p class="text-neutral-500 text-sm mt-1">
+            Essayez d'autres filtres ou explorez tous les parcours.
+          </p>
+          <UButton
+            v-if="hasActiveFilters"
+            variant="outline"
+            class="mt-4"
+            @click="clearAllFilters"
+          >
+            Voir tous les parcours
+          </UButton>
+        </div>
+      </section>
+
+      <!-- Map Section (right on desktop, sticky) -->
+      <section aria-labelledby="map-heading" class="lg:w-[420px] xl:w-[480px] lg:flex-shrink-0 lg:order-2 lg:sticky lg:top-8 lg:self-start">
+        <h2 id="map-heading" class="sr-only">Carte des parcours</h2>
+        <MapView
+          :height="'50vh'"
+          class="lg:rounded-xl lg:overflow-hidden lg:shadow-card"
+          :show-user-position="true"
+          @ready="onMapReady"
+        />
+      </section>
+    </div>
   </div>
 </template>
 
