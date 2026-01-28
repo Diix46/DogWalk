@@ -297,14 +297,14 @@ useSeoMeta({
       </section>
     </div>
 
+    <h2 id="routes-heading" class="text-lg lg:text-xl font-semibold text-neutral-900">
+      Parcours recommandés
+    </h2>
+
     <!-- Desktop: side-by-side layout for map + routes -->
-    <div class="lg:flex lg:gap-8">
+    <div class="lg:flex lg:gap-8 lg:items-start">
       <!-- Routes List (left on desktop) -->
       <section aria-labelledby="routes-heading" class="space-y-4 lg:flex-1 lg:min-w-0 lg:order-1">
-        <h2 id="routes-heading" class="text-lg lg:text-xl font-semibold text-neutral-900">
-          Parcours recommandés
-        </h2>
-
         <!-- Loading State -->
         <div
           v-if="isLoading"
@@ -382,7 +382,7 @@ useSeoMeta({
       </section>
 
       <!-- Map Section (right on desktop, sticky) -->
-      <section aria-labelledby="map-heading" class="lg:w-[45%] xl:w-[50%] lg:flex-shrink-0 lg:order-2 lg:sticky lg:top-8 lg:self-start">
+      <section aria-labelledby="map-heading" class="lg:w-[45%] xl:w-[50%] lg:flex-shrink-0 lg:order-2 lg:sticky lg:top-4">
         <h2 id="map-heading" class="sr-only">Carte des parcours</h2>
         <MapView
           :height="'65vh'"
