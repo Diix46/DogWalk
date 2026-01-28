@@ -37,6 +37,7 @@ export default defineEventHandler(async (event) => {
   // Insert with race-condition safe duplicate handling (fixes H2)
   // Instead of check-then-insert, we try to insert and catch UNIQUE constraint error
   try {
+    const db = useDB()
     const [newUser] = await db.insert(users).values({
       email: normalizedEmail,
       password_hash: passwordHash,

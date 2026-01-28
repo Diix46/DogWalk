@@ -64,7 +64,8 @@ export default defineEventHandler(async (event) => {
   const normalizedEmail = email.toLowerCase().trim()
 
   // Find user by email
-  const user = await db.select().from(users).where(eq(users.email, normalizedEmail)).get()
+  const db = useDB()
+  const [user] = await db.select().from(users).where(eq(users.email, normalizedEmail))
 
   // H1 FIX: Always perform password verification to prevent timing attacks
   // Even if user doesn't exist, we verify against a dummy hash
