@@ -3,21 +3,35 @@ export default defineEventHandler(async (event) => {
   try {
     steps.push('1-start')
     const body = await readBody(event)
-    steps.push('2-body: ' + JSON.stringify(body))
+    const email = (body.email || 'debug@test.com').toLowerCase().trim()
+    const password = body.password || 'testpass123'
 
     const { createPasswordHash } = await import('../utils/password')
-    steps.push('3-import-ok')
-
-    const hash = await createPasswordHash(body.password || 'test')
-    steps.push('4-hash: ' + hash.substring(0, 20) + '...')
+    const passwordHash = await createPasswordHash(password)
+    steps.push('2-hash-ok')
 
     const { users } = await import('../db/schema')
-    steps.push('5-schema-ok')
 
-    steps.push('6-db-type: ' + typeof db)
+    // Test insert with .returning()
+    const result = await db.insert(users).values({
+      email: email + '-' + Date.now(),
+      password_hash: passwordHash,
+      name: null,
+    }).returning()
+    steps.push('3-insert-result: ' + JSON.stringify(result))
 
-    const allUsers = await db.select().from(users).all()
-    steps.push('7-users-count: ' + allUsers.length)
+    const newUser = result[0]
+    steps.push('4-user: ' + JSON.stringify(newUser))
+
+    // Test setUserSession
+    await setUserSession(event, {
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        name: newUser.name,
+      },
+    })
+    steps.push('5-session-ok')
 
     return { ok: true, steps }
   }
