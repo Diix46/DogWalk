@@ -24,8 +24,9 @@ function constantTimeEqual(a: Uint8Array, b: Uint8Array): boolean {
 /**
  * Hash a password using scrypt
  * Returns format: salt:hash (both hex encoded)
+ * Named to avoid conflict with nuxt-auth-utils auto-import
  */
-export function hashPassword(password: string): string {
+export function createPasswordHash(password: string): string {
   const salt = randomBytes(16)
   const hash = scrypt(password, salt, SCRYPT_PARAMS)
   return `${bytesToHex(salt)}:${bytesToHex(hash)}`
@@ -34,8 +35,9 @@ export function hashPassword(password: string): string {
 /**
  * Verify a password against a stored hash
  * Uses constant-time comparison to prevent timing attacks
+ * Named to avoid conflict with nuxt-auth-utils auto-import
  */
-export function verifyPassword(password: string, storedHash: string): boolean {
+export function checkPassword(password: string, storedHash: string): boolean {
   const [saltHex, hashHex] = storedHash.split(':')
   if (!saltHex || !hashHex) {
     return false

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { users } from '../../db/schema'
-import { verifyPassword } from '../../utils/password'
+import { checkPassword } from '../../utils/password'
 import { eq } from 'drizzle-orm'
 
 const loginSchema = z.object({
@@ -70,7 +70,7 @@ export default defineEventHandler(async (event) => {
   // Even if user doesn't exist, we verify against a dummy hash
   // This ensures consistent response time regardless of user existence
   const hashToVerify = user?.password_hash ?? DUMMY_HASH
-  const isValid = verifyPassword(password, hashToVerify)
+  const isValid = checkPassword(password, hashToVerify)
 
   // SECURITY: Check both conditions - user must exist AND password must be valid
   // Same error message for both cases prevents email enumeration

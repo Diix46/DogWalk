@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { users } from '../../db/schema'
-import { hashPassword } from '../../utils/password'
+import { createPasswordHash } from '../../utils/password'
 
 // Stricter email validation with TLD requirement (fixes M2)
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
   const normalizedEmail = email.toLowerCase().trim()
 
   // Hash password before insert
-  const passwordHash = hashPassword(password)
+  const passwordHash = createPasswordHash(password)
 
   // Insert with race-condition safe duplicate handling (fixes H2)
   // Instead of check-then-insert, we try to insert and catch UNIQUE constraint error
