@@ -5,8 +5,5 @@ pages_build_output_dir = ".output/public"
 [vars]
 # Environment variables here (non-secrets)
 
-[[d1_databases]]
-binding = "DB"
-database_name = "dogwalk-db"
-database_id = "c39c296b-4866-4c0f-a3e7-ff7fb545ef88"
-migrations_dir = "server/db/migrations"
+# Note: D1 database binding is configured in nuxt.config.ts via hub.db
+# NuxtHub generates wrangler.json automatically at build time
