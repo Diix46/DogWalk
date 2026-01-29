@@ -35,8 +35,16 @@ export default defineEventHandler(async (event) => {
       if (userId) {
         let premiumUntil: string | null = null
         if (session.subscription) {
-          const sub = await stripe.subscriptions.retrieve(session.subscription as string)
-          premiumUntil = new Date(sub.current_period_end * 1000).toISOString()
+          try {
+            const sub = await stripe.subscriptions.retrieve(session.subscription as string)
+            const endTs = sub.current_period_end
+            // Stripe returns Unix timestamp in seconds
+            premiumUntil = endTs ? new Date(Number(endTs) * 1000).toISOString() : null
+          }
+          catch {
+            // If subscription retrieval fails, set 30 days from now
+            premiumUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+          }
         }
 
         await db.run(sql`
@@ -53,7 +61,8 @@ export default defineEventHandler(async (event) => {
     case 'customer.subscription.updated': {
       const subscription = stripeEvent.data.object as Stripe.Subscription
       const customerId = subscription.customer as string
-      const premiumUntil = new Date(subscription.current_period_end * 1000).toISOString()
+      const endTs = subscription.current_period_end
+      const premiumUntil = endTs ? new Date(Number(endTs) * 1000).toISOString() : null
       const isActive = ['active', 'trialing'].includes(subscription.status)
 
       await db.run(sql`
