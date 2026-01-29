@@ -2,14 +2,26 @@ import type Stripe from 'stripe'
 import StripeLib from 'stripe'
 import { sql } from 'drizzle-orm'
 
-// Cloudflare Workers requires SubtleCryptoProvider for webhook signature verification
 const cryptoProvider = StripeLib.createSubtleCryptoProvider()
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const stripe = useStripe()
 
-  const body = await readRawBody(event)
+  // On Cloudflare Workers, read body from the native web Request
+  // to ensure we get the exact raw bytes Stripe signed
+  let body: string
+  const webRequest = event.web?.request || (event.node?.req as unknown as { body?: ReadableStream })
+  if (event.web?.request) {
+    body = await event.web.request.text()
+  } else {
+    const raw = await readRawBody(event)
+    if (!raw) {
+      throw createError({ statusCode: 400, statusMessage: 'Empty body' })
+    }
+    body = raw
+  }
+
   if (!body) {
     throw createError({ statusCode: 400, statusMessage: 'Empty body' })
   }
@@ -31,11 +43,9 @@ export default defineEventHandler(async (event) => {
   }
   catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
-    console.error('Webhook signature verification failed:', message)
+    console.error('Webhook verify failed:', message, 'body length:', body.length, 'sig:', signature.substring(0, 30))
     throw createError({ statusCode: 400, statusMessage: 'Invalid signature' })
   }
-
-  console.log('Webhook received event:', stripeEvent.type)
 
   const db = useDB()
 
