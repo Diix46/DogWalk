@@ -25,6 +25,7 @@ export default defineEventHandler(async (event) => {
 
   const db = useDB()
 
+  try {
   switch (stripeEvent.type) {
     case 'checkout.session.completed': {
       const session = stripeEvent.data.object as Stripe.Checkout.Session
@@ -76,6 +77,13 @@ export default defineEventHandler(async (event) => {
       `)
       break
     }
+  }
+
+  }
+  catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('Webhook processing error:', message)
+    throw createError({ statusCode: 500, statusMessage: `Webhook error: ${message}` })
   }
 
   return { received: true }
