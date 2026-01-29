@@ -5,20 +5,26 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const stripe = useStripe()
 
-  // Read raw body for signature verification
-  const body = await readRawBody(event)
-  if (!body) {
+  // Read raw body as Buffer for Stripe signature verification
+  // On Cloudflare Workers, readRawBody may return string - ensure it works
+  const rawBody = await readRawBody(event, false)
+  if (!rawBody) {
+    console.error('Webhook: empty body received')
     throw createError({ statusCode: 400, statusMessage: 'Empty body' })
   }
 
+  // Convert to string if Buffer
+  const body = typeof rawBody === 'string' ? rawBody : new TextDecoder().decode(rawBody)
+
   const signature = getHeader(event, 'stripe-signature')
   if (!signature) {
+    console.error('Webhook: missing stripe-signature header')
     throw createError({ statusCode: 400, statusMessage: 'Missing stripe-signature header' })
   }
 
   let stripeEvent: Stripe.Event
   try {
-    stripeEvent = stripe.webhooks.constructEvent(
+    stripeEvent = await stripe.webhooks.constructEventAsync(
       body,
       signature,
       config.stripeWebhookSecret,
@@ -30,6 +36,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid signature' })
   }
 
+  console.log('Webhook received event:', stripeEvent.type)
+
   const db = useDB()
 
   switch (stripeEvent.type) {
@@ -38,8 +46,9 @@ export default defineEventHandler(async (event) => {
       const userId = session.metadata?.user_id
       const customerId = session.customer as string
 
+      console.log('Checkout completed for user:', userId, 'customer:', customerId)
+
       if (userId) {
-        // Get subscription end date
         let premiumUntil: string | null = null
         if (session.subscription) {
           const sub = await stripe.subscriptions.retrieve(session.subscription as string)
@@ -53,6 +62,7 @@ export default defineEventHandler(async (event) => {
               stripe_customer_id = ${customerId}
           WHERE id = ${Number(userId)}
         `)
+        console.log('User', userId, 'upgraded to premium until', premiumUntil)
       }
       break
     }
