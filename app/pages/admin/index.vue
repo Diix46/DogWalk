@@ -34,6 +34,25 @@ const activeTab = ref('stats')
 
 const toast = useToast()
 
+const resetUserId = ref<number | null>(null)
+const resetPassword = ref('')
+
+async function resetUserPassword() {
+  if (!resetUserId.value || resetPassword.value.length < 8) return
+  try {
+    await $fetch(`/api/admin/users/${resetUserId.value}`, {
+      method: 'PATCH',
+      body: { newPassword: resetPassword.value },
+    })
+    toast.add({ title: 'Mot de passe réinitialisé', color: 'success' })
+    resetUserId.value = null
+    resetPassword.value = ''
+  }
+  catch {
+    toast.add({ title: 'Erreur', color: 'error' })
+  }
+}
+
 async function toggleRoute(routeId: string, field: 'is_active' | 'is_premium', current: number) {
   try {
     await $fetch(`/api/admin/routes/${routeId}`, {
@@ -153,7 +172,8 @@ function formatDuration(s: number) {
               <th class="py-2 pr-4">Nom</th>
               <th class="py-2 pr-4">Balades</th>
               <th class="py-2 pr-4">Streak</th>
-              <th class="py-2">Statut</th>
+              <th class="py-2 pr-4">Statut</th>
+              <th class="py-2">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -162,10 +182,30 @@ function formatDuration(s: number) {
               <td class="py-2 pr-4">{{ u.name || '-' }}</td>
               <td class="py-2 pr-4">{{ u.walk_count }}</td>
               <td class="py-2 pr-4">{{ u.streak_count }}</td>
-              <td class="py-2 flex gap-1">
+              <td class="py-2 pr-4 flex gap-1">
                 <UBadge v-if="u.is_admin" color="error" variant="subtle" size="xs">Admin</UBadge>
                 <UBadge v-if="u.is_premium" color="warning" variant="subtle" size="xs">Premium</UBadge>
                 <UBadge v-if="!u.is_premium && !u.is_admin" color="neutral" variant="subtle" size="xs">Gratuit</UBadge>
+              </td>
+              <td class="py-2">
+                <UButton
+                  v-if="resetUserId !== u.id"
+                  size="xs"
+                  variant="ghost"
+                  color="neutral"
+                  icon="i-heroicons-key"
+                  @click="resetUserId = u.id; resetPassword = ''"
+                />
+                <div v-else class="flex items-center gap-1">
+                  <input
+                    v-model="resetPassword"
+                    type="text"
+                    placeholder="Nouveau mdp"
+                    class="w-28 text-xs border rounded px-1.5 py-1"
+                  >
+                  <UButton size="xs" color="primary" :disabled="resetPassword.length < 8" @click="resetUserPassword()">OK</UButton>
+                  <UButton size="xs" variant="ghost" color="neutral" @click="resetUserId = null">X</UButton>
+                </div>
               </td>
             </tr>
           </tbody>

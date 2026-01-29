@@ -12,34 +12,12 @@ const loginSchema = z.object({
 // Format matches real hashes: 32-char salt + ':' + 64-char hash
 const DUMMY_HASH = '0'.repeat(32) + ':' + '0'.repeat(64)
 
-// H2 FIX: Simple rate limiter (in-memory for dev)
-// NOTE: For production on Cloudflare, use Cloudflare Rate Limiting rules
-// or implement with KV/D1 for distributed rate limiting
-const loginAttempts = new Map<string, { count: number; resetAt: number }>()
-const RATE_LIMIT_WINDOW_MS = 60 * 1000 // 1 minute
-const RATE_LIMIT_MAX_ATTEMPTS = 5
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now()
-  const record = loginAttempts.get(ip)
-
-  if (!record || now > record.resetAt) {
-    loginAttempts.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS })
-    return true
-  }
-
-  if (record.count >= RATE_LIMIT_MAX_ATTEMPTS) {
-    return false
-  }
-
-  record.count++
-  return true
-}
+import { checkRateLimitD1 } from '../../utils/rate-limit'
 
 export default defineEventHandler(async (event) => {
-  // H2 FIX: Rate limiting check
+  // Rate limiting via D1 (distributed, persistent across deploys)
   const ip = getRequestIP(event, { xForwardedFor: true }) ?? 'unknown'
-  if (!checkRateLimit(ip)) {
+  if (!await checkRateLimitD1(ip)) {
     throw createError({
       statusCode: 429,
       statusMessage: 'Trop de tentatives. Réessaie dans une minute.',

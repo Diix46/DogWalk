@@ -6,7 +6,14 @@ export default defineNuxtConfig({
     compatibilityVersion: 4,
   },
 
-  modules: ['@nuxt/ui', '@nuxthub/core', 'nuxt-auth-utils', '@nuxt/content', 'nuxt-studio'],
+  modules: [
+    '@nuxt/ui',
+    '@nuxthub/core',
+    'nuxt-auth-utils',
+    '@nuxt/content',
+    'nuxt-studio',
+    '@vite-pwa/nuxt',
+  ],
 
   studio: {
     repository: {
@@ -43,6 +50,27 @@ export default defineNuxtConfig({
   // Cloudflare Pages deployment
   nitro: {
     preset: 'cloudflare-pages',
+  },
+
+  pwa: {
+    registerType: 'autoUpdate',
+    manifest: {
+      name: 'DogWalk',
+      short_name: 'DogWalk',
+      description: 'Trouve les meilleures balades pour ton chien',
+      theme_color: '#2563eb',
+      background_color: '#fafafa',
+      display: 'standalone',
+      start_url: '/',
+      icons: [
+        { src: '/pwa-192x192.svg', sizes: '192x192', type: 'image/svg+xml' },
+        { src: '/pwa-512x512.svg', sizes: '512x512', type: 'image/svg+xml' },
+      ],
+    },
+    workbox: {
+      navigateFallback: undefined,
+      globPatterns: ['**/*.{js,css,html,png,svg,ico,woff2}'],
+    },
   },
 
   // NuxtUI theme configuration

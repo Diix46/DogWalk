@@ -50,6 +50,10 @@ definePageMeta({ layout: 'default' })
 useSeoMeta({
   title: 'Articles - DogWalk',
   description: 'Conseils et articles sur le bien-être animal',
+  ogTitle: 'Articles - DogWalk',
+  ogDescription: 'Conseils et astuces pour le bien-être de votre compagnon',
+  ogType: 'website',
+  twitterCard: 'summary',
 })
 </script>
 

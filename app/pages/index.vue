@@ -1,6 +1,9 @@
 <script setup lang="ts">
 const { loggedIn, user } = useUserSession()
 
+// Walk reminder notification
+useWalkReminder()
+
 const userName = computed(() => (user.value as { name?: string | null } | null)?.name)
 
 // TimeSelector state
