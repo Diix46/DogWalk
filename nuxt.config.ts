@@ -8,6 +8,15 @@ export default defineNuxtConfig({
 
   modules: ['@nuxt/ui', '@nuxthub/core', 'nuxt-auth-utils', '@nuxt/content', 'nuxt-studio'],
 
+  studio: {
+    repository: {
+      provider: 'github',
+      owner: 'Diix46',
+      repo: 'DogWalk',
+      branch: 'main',
+    },
+  },
+
   // NuxtHub configuration for D1 database (v0.10+)
    hub: {
     db: {

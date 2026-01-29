@@ -68,7 +68,19 @@ function formatDuration(s: number) {
   </div>
 
   <div v-else class="space-y-6 lg:max-w-4xl lg:mx-auto">
-    <h1 class="text-2xl font-bold text-neutral-900">Dashboard Admin</h1>
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-bold text-neutral-900">Dashboard Admin</h1>
+      <UButton
+        to="/__nuxt_studio/auth/custom"
+        external
+        target="_blank"
+        icon="i-heroicons-pencil-square"
+        variant="soft"
+        size="sm"
+      >
+        Gérer les articles
+      </UButton>
+    </div>
 
     <!-- Loading -->
     <div v-if="isLoading" class="flex items-center justify-center py-8">
