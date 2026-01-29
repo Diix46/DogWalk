@@ -1,50 +1,26 @@
 import type Stripe from 'stripe'
-import StripeLib from 'stripe'
 import { sql } from 'drizzle-orm'
 
-const cryptoProvider = StripeLib.createSubtleCryptoProvider()
-
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
   const stripe = useStripe()
 
-  // On Cloudflare Workers, read body from the native web Request
-  // to ensure we get the exact raw bytes Stripe signed
-  let body: string
-  const webRequest = event.web?.request || (event.node?.req as unknown as { body?: ReadableStream })
-  if (event.web?.request) {
-    body = await event.web.request.text()
-  } else {
-    const raw = await readRawBody(event)
-    if (!raw) {
-      throw createError({ statusCode: 400, statusMessage: 'Empty body' })
-    }
-    body = raw
+  // Read the event payload
+  const payload = await readBody(event)
+  if (!payload?.id || !payload?.type) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid payload' })
   }
 
-  if (!body) {
-    throw createError({ statusCode: 400, statusMessage: 'Empty body' })
-  }
-
-  const signature = getHeader(event, 'stripe-signature')
-  if (!signature) {
-    throw createError({ statusCode: 400, statusMessage: 'Missing stripe-signature header' })
-  }
-
+  // Verify the event by retrieving it from Stripe API
+  // This is a secure alternative to signature verification
+  // that works reliably on Cloudflare Workers
   let stripeEvent: Stripe.Event
   try {
-    stripeEvent = await stripe.webhooks.constructEventAsync(
-      body,
-      signature,
-      config.stripeWebhookSecret,
-      undefined,
-      cryptoProvider,
-    )
+    stripeEvent = await stripe.events.retrieve(payload.id)
   }
   catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
-    console.error('Webhook verify failed:', message, 'body length:', body.length, 'sig:', signature.substring(0, 30))
-    throw createError({ statusCode: 400, statusMessage: 'Invalid signature' })
+    console.error('Webhook: failed to retrieve event from Stripe:', message)
+    throw createError({ statusCode: 400, statusMessage: 'Event not found in Stripe' })
   }
 
   const db = useDB()
