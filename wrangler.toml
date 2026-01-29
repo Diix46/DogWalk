@@ -5,5 +5,5 @@ pages_build_output_dir = ".output/public"
 [vars]
 # Environment variables here (non-secrets)
 
-# Note: D1 database binding is configured in nuxt.config.ts via hub.db
+# D1 database binding is configured in nuxt.config.ts via hub.db
 # NuxtHub generates wrangler.json automatically at build time

@@ -46,6 +46,37 @@ export function useWeather() {
     }
   }
 
+  // Polling for live weather during walks (Story 8.4)
+  let pollingInterval: ReturnType<typeof setInterval> | null = null
+  const previousCondition = ref<string | null>(null)
+  const weatherDegraded = ref(false)
+
+  const adverseConditions = ['rainy', 'stormy', 'snowy']
+
+  function startWeatherPolling(lat: number, lng: number, intervalMs = 15 * 60 * 1000) {
+    stopWeatherPolling()
+    // Capture initial condition
+    if (weather.value?.condition) {
+      previousCondition.value = weather.value.condition
+    }
+    pollingInterval = setInterval(async () => {
+      const prevCond = weather.value?.condition ?? null
+      await fetchWeather(lat, lng)
+      const newCond = weather.value?.condition ?? null
+      if (prevCond && newCond && prevCond !== newCond && adverseConditions.includes(newCond)) {
+        weatherDegraded.value = true
+      }
+    }, intervalMs)
+  }
+
+  function stopWeatherPolling() {
+    if (pollingInterval) {
+      clearInterval(pollingInterval)
+      pollingInterval = null
+    }
+    weatherDegraded.value = false
+  }
+
   return {
     weather,
     isLoading,
@@ -54,5 +85,8 @@ export function useWeather() {
     forecast,
     forecastLoading,
     fetchForecast,
+    startWeatherPolling,
+    stopWeatherPolling,
+    weatherDegraded,
   }
 }

@@ -28,6 +28,8 @@ interface Props {
   showUserPosition?: boolean
   /** Height of map container */
   height?: string
+  /** Show start/end markers on route */
+  startEndMarkers?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -36,6 +38,7 @@ const props = withDefaults(defineProps<Props>(), {
   route: null,
   showUserPosition: false,
   height: '400px',
+  startEndMarkers: false,
 })
 
 const emit = defineEmits<{
@@ -53,6 +56,9 @@ const locationError = ref<string>()
 
 // User position marker
 let userMarker: maplibregl.Marker | null = null
+// Start/end markers
+let startMarker: maplibregl.Marker | null = null
+let endMarker: maplibregl.Marker | null = null
 
 /**
  * OpenStreetMap style configuration
@@ -125,6 +131,10 @@ onUnmounted(() => {
     userMarker.remove()
     userMarker = null
   }
+  startMarker?.remove()
+  endMarker?.remove()
+  startMarker = null
+  endMarker = null
   if (map.value) {
     map.value.remove()
     map.value = undefined
@@ -188,6 +198,31 @@ function addRouteLayer(mapInstance: maplibregl.Map, geojson: RouteGeoJSON) {
       'line-join': 'round',
     },
   })
+
+  // Add start/end markers if enabled
+  if (props.startEndMarkers && geojson.coordinates.length >= 2) {
+    // Remove existing markers
+    startMarker?.remove()
+    endMarker?.remove()
+
+    const startCoord = geojson.coordinates[0] as [number, number]
+    const endCoord = geojson.coordinates[geojson.coordinates.length - 1] as [number, number]
+
+    const createMarkerEl = (color: string, label: string) => {
+      const el = document.createElement('div')
+      el.className = 'route-marker'
+      el.style.cssText = `width:14px;height:14px;background:${color};border-radius:50%;border:2.5px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);`
+      el.setAttribute('aria-label', label)
+      return el
+    }
+
+    startMarker = new maplibregl.Marker({ element: createMarkerEl('#16a34a', 'Départ') })
+      .setLngLat(startCoord)
+      .addTo(mapInstance)
+    endMarker = new maplibregl.Marker({ element: createMarkerEl('#dc2626', 'Arrivée') })
+      .setLngLat(endCoord)
+      .addTo(mapInstance)
+  }
 
   // Fit bounds to route
   if (geojson.coordinates.length > 0) {

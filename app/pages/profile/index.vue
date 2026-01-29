@@ -36,7 +36,7 @@ interface WalkStats {
   totalDistance: number
   totalDuration: number
 }
-const { data: stats } = await useFetch<WalkStats>('/api/walks/stats')
+const { data: stats, error: statsError } = await useFetch<WalkStats>('/api/walks/stats')
 
 const formattedWalks = computed(() => {
   const n = stats.value?.totalWalks ?? 0
@@ -55,7 +55,7 @@ const formattedDuration = computed(() => {
 })
 
 // Fetch user's dogs
-const { data: dogs, refresh: refreshDogs } = await useFetch<Dog[]>('/api/dogs')
+const { data: dogs, error: dogsError, refresh: refreshDogs } = await useFetch<Dog[]>('/api/dogs')
 
 const hasDog = computed(() => dogs.value && dogs.value.length > 0)
 const firstDog = computed(() => dogs.value?.[0])
@@ -190,6 +190,20 @@ async function logout() {
         </div>
       </UCard>
     </div>
+
+    <!-- Error states -->
+    <UAlert
+      v-if="statsError"
+      color="warning"
+      icon="i-heroicons-exclamation-triangle"
+      title="Impossible de charger les statistiques"
+    />
+    <UAlert
+      v-if="dogsError"
+      color="warning"
+      icon="i-heroicons-exclamation-triangle"
+      title="Impossible de charger les données du chien"
+    />
 
     <!-- Streak -->
     <WalkStreakDisplay />

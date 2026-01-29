@@ -10,6 +10,7 @@ const toast = useToast()
 const { fetch: fetchSession } = useUserSession()
 
 const schema = z.object({
+  name: z.string().optional(),
   email: z.string().email('Email invalide'),
   password: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères'),
 })
@@ -17,6 +18,7 @@ const schema = z.object({
 type Schema = z.output<typeof schema>
 
 const state = reactive({
+  name: '',
   email: '',
   password: '',
 })
@@ -122,6 +124,17 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         </div>
 
         <UForm :schema="schema" :state="state" class="space-y-6" @submit="onSubmit">
+          <UFormField label="Nom (optionnel)" name="name" size="lg">
+            <UInput
+              v-model="state.name"
+              placeholder="Ton prénom"
+              autocomplete="name"
+              icon="i-heroicons-user"
+              size="lg"
+              class="w-full"
+            />
+          </UFormField>
+
           <UFormField label="Email" name="email" size="lg">
             <UInput
               v-model="state.email"

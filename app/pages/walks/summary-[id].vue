@@ -91,6 +91,39 @@ const encouragingMessage = computed(() => {
 })
 
 /**
+ * Review form state
+ */
+const reviewRating = ref(0)
+const reviewComment = ref('')
+const reviewSubmitted = ref(false)
+const isSubmittingReview = ref(false)
+const toast = useToast()
+
+async function submitReview() {
+  if (reviewRating.value < 1 || !walkData.value) return
+  isSubmittingReview.value = true
+  try {
+    await $fetch('/api/reviews', {
+      method: 'POST',
+      body: {
+        route_id: walkData.value.route_id,
+        walk_id: walkData.value.id,
+        rating: reviewRating.value,
+        comment: reviewComment.value || null,
+      },
+    })
+    reviewSubmitted.value = true
+    toast.add({ title: 'Merci pour ton avis !', icon: 'i-heroicons-star', color: 'success' })
+  }
+  catch {
+    toast.add({ title: 'Erreur lors de l\'envoi', color: 'error' })
+  }
+  finally {
+    isSubmittingReview.value = false
+  }
+}
+
+/**
  * Animation state for confetti
  */
 const showConfetti = ref(false)
@@ -199,6 +232,41 @@ useSeoMeta({
           month: 'long',
         }) }}
       </p>
+
+      <!-- Review Section -->
+      <div v-if="!reviewSubmitted" class="bg-neutral-50 rounded-xl p-4 text-left space-y-3">
+        <h3 class="font-semibold text-neutral-900 text-center">Note cette balade</h3>
+        <div class="flex justify-center gap-2">
+          <button
+            v-for="star in 5"
+            :key="star"
+            type="button"
+            class="text-3xl transition-transform hover:scale-110"
+            :class="star <= reviewRating ? 'text-yellow-400' : 'text-neutral-300'"
+            @click="reviewRating = star"
+          >
+            ★
+          </button>
+        </div>
+        <UTextarea
+          v-if="reviewRating > 0"
+          v-model="reviewComment"
+          placeholder="Un commentaire ? (optionnel)"
+          :rows="2"
+        />
+        <UButton
+          v-if="reviewRating > 0"
+          block
+          :loading="isSubmittingReview"
+          @click="submitReview"
+        >
+          Envoyer mon avis
+        </UButton>
+      </div>
+      <div v-else class="bg-success/10 rounded-xl p-4 text-center">
+        <UIcon name="i-heroicons-check-circle" class="w-6 h-6 text-success mx-auto mb-1" />
+        <p class="text-sm text-success font-medium">Merci pour ton avis !</p>
+      </div>
 
       <!-- Action Buttons -->
       <div class="space-y-3 pt-4">

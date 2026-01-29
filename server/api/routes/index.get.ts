@@ -114,6 +114,21 @@ export default defineEventHandler(async (event) => {
 
   let results = await dbQuery
 
+  // Fetch review stats for all returned routes
+  const routeIds = results.map(r => r.id)
+  let reviewStatsMap: Record<string, { avg_rating: number; review_count: number }> = {}
+  if (routeIds.length > 0) {
+    const reviewStats = await db.all(sql`
+      SELECT route_id, AVG(rating) as avg_rating, COUNT(*) as review_count
+      FROM reviews
+      WHERE route_id IN (${sql.join(routeIds.map(id => sql`${id}`), sql`,`)})
+      GROUP BY route_id
+    `) as Array<{ route_id: string; avg_rating: number; review_count: number }>
+    for (const s of reviewStats) {
+      reviewStatsMap[s.route_id] = { avg_rating: Math.round(s.avg_rating * 10) / 10, review_count: s.review_count }
+    }
+  }
+
   // Calculate distance and sort by proximity if coordinates provided (Story 3.6)
   const hasUserLocation = lat !== undefined && lng !== undefined
 
@@ -136,11 +151,11 @@ export default defineEventHandler(async (event) => {
     resultsWithDistance.sort((a: RouteWithDistance, b: RouteWithDistance) => a.distance_from_user - b.distance_from_user)
 
     // Map to frontend types with distance
-    return resultsWithDistance.map((route: RouteWithDistance) => mapRouteToFrontend(route, route.distance_from_user))
+    return resultsWithDistance.map((route: RouteWithDistance) => mapRouteToFrontend(route, route.distance_from_user, reviewStatsMap[route.id]))
   }
 
   // Map database values to frontend types (no distance)
-  return results.map((route: typeof routes.$inferSelect) => mapRouteToFrontend(route))
+  return results.map((route: typeof routes.$inferSelect) => mapRouteToFrontend(route, undefined, reviewStatsMap[route.id]))
 })
 
 /**
@@ -164,7 +179,8 @@ function mapDifficulty(dbDifficulty: string): DifficultyLevel {
  */
 function mapRouteToFrontend(
   dbRoute: typeof routes.$inferSelect,
-  distanceFromUser?: number
+  distanceFromUser?: number,
+  reviewStats?: { avg_rating: number; review_count: number },
 ) {
   const result: Record<string, unknown> = {
     id: dbRoute.id,
@@ -182,6 +198,11 @@ function mapRouteToFrontend(
   // Only include distance_from_user when location was provided (Story 3.6)
   if (distanceFromUser !== undefined) {
     result.distance_from_user = Math.round(distanceFromUser) // Round to nearest meter
+  }
+
+  if (reviewStats) {
+    result.avg_rating = reviewStats.avg_rating
+    result.review_count = reviewStats.review_count
   }
 
   return result

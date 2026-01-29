@@ -6,7 +6,7 @@ export default defineNuxtConfig({
     compatibilityVersion: 4,
   },
 
-  modules: ['@nuxt/ui', '@nuxthub/core', 'nuxt-auth-utils'],
+  modules: ['@nuxt/ui', '@nuxthub/core', 'nuxt-auth-utils', '@nuxt/content'],
 
   // NuxtHub configuration for D1 database (v0.10+)
    hub: {

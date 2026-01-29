@@ -10,6 +10,7 @@ export const users = sqliteTable('users', {
   is_premium: integer('is_premium', { mode: 'boolean' }).notNull().default(false),
   premium_until: text('premium_until'), // ISO date string
   stripe_customer_id: text('stripe_customer_id'),
+  is_admin: integer('is_admin', { mode: 'boolean' }).notNull().default(false),
   created_at: integer('created_at', { mode: 'timestamp' })
     .notNull()
     .$defaultFn(() => new Date()),
@@ -57,6 +58,9 @@ export const routes = sqliteTable('routes', {
   geojson_path: text('geojson_path'), // GeoJSON LineString as JSON string
   center_lat: real('center_lat').notNull(),
   center_lng: real('center_lng').notNull(),
+  source: text('source', { enum: ['curated', 'osm'] }).notNull().default('curated'),
+  osm_area_hash: text('osm_area_hash'),
+  generated_at: text('generated_at'),
   created_at: text('created_at').$defaultFn(() => new Date().toISOString()),
   updated_at: text('updated_at').$defaultFn(() => new Date().toISOString()),
 })
@@ -90,3 +94,24 @@ export const walks = sqliteTable('walks', {
 
 export type Walk = typeof walks.$inferSelect
 export type NewWalk = typeof walks.$inferInsert
+
+// Reviews table - community feedback on routes
+export const reviews = sqliteTable('reviews', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  user_id: integer('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  route_id: text('route_id')
+    .notNull()
+    .references(() => routes.id, { onDelete: 'cascade' }),
+  walk_id: integer('walk_id')
+    .references(() => walks.id, { onDelete: 'set null' }),
+  rating: integer('rating').notNull(), // 1-5
+  comment: text('comment'),
+  created_at: integer('created_at', { mode: 'timestamp' })
+    .notNull()
+    .$defaultFn(() => new Date()),
+})
+
+export type Review = typeof reviews.$inferSelect
+export type NewReview = typeof reviews.$inferInsert

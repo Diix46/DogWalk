@@ -4,6 +4,7 @@ const route = useRoute()
 const navItems = [
   { name: 'Accueil', to: '/', icon: 'i-heroicons-home' },
   { name: 'Explorer', to: '/explore', icon: 'i-heroicons-map' },
+  { name: 'Articles', to: '/articles', icon: 'i-heroicons-document-text' },
   { name: 'Profil', to: '/profile', icon: 'i-heroicons-user' },
 ]
 

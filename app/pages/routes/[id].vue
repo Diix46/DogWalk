@@ -14,9 +14,10 @@ const route = useRoute()
 const routeId = computed(() => route.params.id as string)
 const toast = useToast()
 const { loggedIn } = useUserSession()
+const { isPremium } = usePremium()
 
-// Weather integration (Story 5.4)
-const { weather, isLoading: weatherLoading, fetchWeather } = useWeather()
+// Weather integration (Story 5.4 + 8.2/8.3)
+const { weather, isLoading: weatherLoading, fetchWeather, forecast, forecastLoading, fetchForecast } = useWeather()
 
 /**
  * Fetch route data
@@ -25,14 +26,35 @@ const { data: routeData, status, error } = useFetch<Route>(() => `/api/routes/${
   watch: [routeId],
 })
 
+// Fetch reviews
+interface ReviewData {
+  reviews: Array<{ id: number; rating: number; comment: string | null; created_at: number; user_name: string | null }>
+  stats: { count: number; avgRating: number }
+}
+const { data: reviewData } = useFetch<ReviewData>(() => `/api/reviews/${routeId.value}`, { watch: [routeId] })
+
 // Fetch weather when route data is available
 watch(routeData, (data) => {
   if (data) {
     const lat = data.center_lat ?? 43.5185
     const lng = data.center_lng ?? 1.3370
     fetchWeather(lat, lng)
+    fetchForecast(lat, lng)
   }
 }, { immediate: true })
+
+/**
+ * Parse GeoJSON path for map display (Story 8.1)
+ */
+const parsedGeoJSON = computed(() => {
+  if (!routeData.value?.geojson_path) return null
+  try {
+    return JSON.parse(routeData.value.geojson_path)
+  }
+  catch {
+    return null
+  }
+})
 
 /**
  * Loading state
@@ -75,12 +97,11 @@ const typeConfig = computed(() => {
 
 /**
  * Check if user can start this route
- * For now, all routes are startable (premium system not implemented yet)
+ * Premium routes require premium membership
  */
 const canStart = computed(() => {
   if (!routeData.value) return false
-  // Future: check if user is premium for premium routes
-  // For now, allow all routes
+  if (routeData.value.is_premium && !isPremium.value) return false
   return true
 })
 
@@ -217,7 +238,7 @@ useSeoMeta({
         </span>
       </div>
 
-      <!-- Map Section -->
+      <!-- Map Section with route itinerary -->
       <section aria-labelledby="map-heading" class="rounded-lg overflow-hidden">
         <h2 id="map-heading" class="sr-only">Carte du parcours</h2>
         <MapView
@@ -226,7 +247,9 @@ useSeoMeta({
             ? [routeData.center_lng, routeData.center_lat]
             : undefined"
           :zoom="14"
+          :route="parsedGeoJSON"
           :show-user-position="false"
+          :start-end-markers="true"
         />
       </section>
 
@@ -266,6 +289,45 @@ useSeoMeta({
             <UIcon :name="typeConfig.icon" class="w-4 h-4" />
             {{ typeConfig.label }}
           </span>
+        </div>
+      </section>
+
+      <!-- Weather Forecast Section (Story 8.2 + 8.3) -->
+      <section v-if="forecast?.available || forecastLoading" class="space-y-3">
+        <WeatherAlert
+          v-if="forecast?.available && forecast.entries.length > 0"
+          :entries="forecast.entries"
+          :duration-minutes="routeData.duration_minutes"
+        />
+        <WeatherTimeline
+          :entries="forecast?.entries ?? []"
+          :duration-minutes="routeData.duration_minutes"
+          :loading="forecastLoading"
+        />
+      </section>
+
+      <!-- Reviews Section -->
+      <section v-if="reviewData && reviewData.stats.count > 0" class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="font-semibold text-neutral-900">Avis de la communauté</h3>
+          <div class="flex items-center gap-1 text-sm">
+            <span class="text-yellow-400 text-lg">★</span>
+            <span class="font-bold">{{ reviewData.stats.avgRating }}</span>
+            <span class="text-neutral-500">({{ reviewData.stats.count }})</span>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <div
+            v-for="review in reviewData.reviews.slice(0, 5)"
+            :key="review.id"
+            class="bg-neutral-50 rounded-lg p-3"
+          >
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-sm font-medium text-neutral-700">{{ review.user_name || 'Anonyme' }}</span>
+              <span class="text-yellow-400 text-sm">{{ '★'.repeat(review.rating) }}{{ '☆'.repeat(5 - review.rating) }}</span>
+            </div>
+            <p v-if="review.comment" class="text-sm text-neutral-600">{{ review.comment }}</p>
+          </div>
         </div>
       </section>
 

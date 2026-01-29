@@ -44,12 +44,14 @@ export default defineEventHandler(async (event) => {
       name: name || null,
     }).returning()
 
-    // Create session (nuxt-auth-utils)
+    // Create session (nuxt-auth-utils) — include is_premium & is_admin like login
     await setUserSession(event, {
       user: {
         id: newUser.id,
         email: newUser.email,
         name: newUser.name,
+        is_premium: false,
+        is_admin: false,
       },
     })
 

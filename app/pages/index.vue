@@ -12,7 +12,7 @@ interface WalkStats {
   totalDistance: number
   totalDuration: number
 }
-const { data: stats } = loggedIn.value ? useFetch<WalkStats>('/api/walks/stats') : { data: ref(null) }
+const { data: stats, error: statsError } = loggedIn.value ? useFetch<WalkStats>('/api/walks/stats') : { data: ref(null), error: ref(null) }
 
 // Weather integration (Story 5.3, 5.5)
 const { coords, getCurrentPosition } = useGeolocation()
@@ -92,8 +92,17 @@ function onDurationSelect(minutes: number) {
       </UButton>
     </div>
 
+    <!-- Stats error -->
+    <UAlert
+      v-if="loggedIn && statsError"
+      color="warning"
+      icon="i-heroicons-exclamation-triangle"
+      title="Impossible de charger les statistiques"
+      class="lg:max-w-2xl lg:mx-auto"
+    />
+
     <!-- Quick Stats (if logged in) -->
-    <div v-else class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+    <div v-else-if="loggedIn" class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
       <UCard>
         <div class="text-center py-2 lg:py-4">
           <p class="text-2xl lg:text-3xl font-bold text-primary">{{ stats?.totalWalks ?? 0 }}</p>

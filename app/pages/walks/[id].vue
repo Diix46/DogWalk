@@ -21,6 +21,10 @@ const nuxtRoute = useRoute()
 const walkId = computed(() => nuxtRoute.params.id as string)
 const toast = useToast()
 
+// Weather polling during walk (Story 8.4)
+const { weather: walkWeather, fetchWeather, startWeatherPolling, stopWeatherPolling, weatherDegraded } = useWeather()
+const weatherAlertDismissed = ref(false)
+
 // Fetch walk data
 const { data: walkData, error: walkError, refresh: refreshWalk } = useFetch<{
   id: number
@@ -42,6 +46,13 @@ watch(() => walkData.value?.route_id, async (routeId) => {
   if (routeId) {
     try {
       routeData.value = await $fetch<Route>(`/api/routes/${routeId}`)
+      // Start weather polling for active walk (Story 8.4)
+      if (routeData.value && walkData.value?.status === 'active') {
+        const lat = routeData.value.center_lat ?? 43.5185
+        const lng = routeData.value.center_lng ?? 1.3370
+        await fetchWeather(lat, lng)
+        startWeatherPolling(lat, lng)
+      }
     }
     catch (err) {
       console.error('Failed to fetch route:', err)
@@ -105,6 +116,18 @@ onUnmounted(() => {
   if (durationInterval) {
     clearInterval(durationInterval)
     durationInterval = null
+  }
+})
+
+// Show toast on weather degradation (Story 8.4)
+watch(weatherDegraded, (degraded) => {
+  if (degraded && !weatherAlertDismissed.value) {
+    toast.add({
+      title: 'Météo dégradée',
+      description: `${walkWeather.value?.description || 'Conditions défavorables'} — restez vigilant`,
+      icon: 'i-heroicons-cloud-arrow-down',
+      color: 'warning',
+    })
   }
 })
 
@@ -177,6 +200,7 @@ async function handleFinishWalk() {
 
   isFinishing.value = true
   stopTracking()
+  stopWeatherPolling()
 
   // Stop duration timer
   if (durationInterval) {
@@ -224,6 +248,7 @@ function promptCancelWalk() {
 async function handleCancelWalk() {
   showCancelConfirm.value = false
   stopTracking()
+  stopWeatherPolling()
 
   try {
     await $fetch(`/api/walks/${walkId.value}`, {
@@ -342,6 +367,26 @@ useSeoMeta({
           <div class="flex items-center gap-2">
             <UIcon name="i-heroicons-exclamation-triangle" class="w-4 h-4" />
             {{ trackingError }}
+          </div>
+        </div>
+
+        <!-- Weather Degradation Alert (Story 8.4) -->
+        <div
+          v-if="weatherDegraded && !weatherAlertDismissed"
+          class="absolute top-20 left-4 right-4 bg-warning/90 text-white px-4 py-3 rounded-lg z-10"
+        >
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-cloud-arrow-down" class="w-5 h-5" />
+              <span class="text-sm font-medium">{{ walkWeather?.description || 'Météo dégradée' }}</span>
+            </div>
+            <UButton
+              variant="ghost"
+              size="xs"
+              icon="i-heroicons-x-mark"
+              class="text-white"
+              @click="weatherAlertDismissed = true"
+            />
           </div>
         </div>
 

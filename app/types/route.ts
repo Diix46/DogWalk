@@ -48,6 +48,10 @@ export interface Route {
   created_at?: string
   /** Distance from user's location in meters (only present when lat/lng provided) */
   distance_from_user?: number
+  /** Average rating (1-5) from community reviews */
+  avg_rating?: number
+  /** Number of reviews */
+  review_count?: number
 }
 
 /**

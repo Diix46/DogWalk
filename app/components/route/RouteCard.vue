@@ -178,6 +178,14 @@ const ariaLabel = computed(() => {
           <UIcon name="i-heroicons-arrow-trending-up" class="w-4 h-4" />
           {{ formatDistanceFromUser(route.distance_from_user!) }}
         </span>
+        <!-- Rating -->
+        <span
+          v-if="route.avg_rating"
+          class="inline-flex items-center gap-1 text-yellow-500"
+        >
+          <span class="text-sm">★</span>
+          {{ route.avg_rating }}
+        </span>
       </div>
 
       <!-- Badges Row -->

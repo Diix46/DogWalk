@@ -99,15 +99,17 @@ const apiUrl = computed(() => {
     params.set('target', String(durationRange.value.target))
   }
 
-  // Location params (Story 3.6)
-  if (userCoords.value) {
-    params.set('lat', String(userCoords.value.lat))
-    params.set('lng', String(userCoords.value.lng))
-  }
-
   // Type filter (Story 3.7)
   if (selectedType.value) {
     params.set('type', selectedType.value)
+  }
+
+  // Use discover endpoint when geolocation available (Story 9.5)
+  if (userCoords.value) {
+    params.set('lat', String(userCoords.value.lat))
+    params.set('lng', String(userCoords.value.lng))
+    const queryString = params.toString()
+    return `/api/routes/discover?${queryString}`
   }
 
   const queryString = params.toString()

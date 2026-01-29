@@ -9,6 +9,8 @@ useSeoMeta({
 })
 
 const { user } = useUserSession()
+const { isPremium } = usePremium()
+const toast = useToast()
 const isSubscribing = ref(false)
 
 const benefits = [
@@ -46,6 +48,12 @@ async function subscribe() {
   }
   catch (error) {
     console.error('Checkout error:', error)
+    toast.add({
+      title: 'Erreur',
+      description: 'Impossible de lancer le paiement. Réessaie plus tard.',
+      icon: 'i-heroicons-exclamation-triangle',
+      color: 'error',
+    })
   }
   finally {
     isSubscribing.value = false
@@ -55,6 +63,16 @@ async function subscribe() {
 
 <template>
   <div class="max-w-2xl mx-auto space-y-8 py-4">
+    <!-- Already Premium Banner -->
+    <UAlert
+      v-if="isPremium"
+      color="success"
+      icon="i-heroicons-check-circle"
+      title="Tu es déjà membre Premium !"
+      description="Tu as accès à tous les parcours et fonctionnalités exclusives."
+      class="mb-4"
+    />
+
     <!-- Header -->
     <div class="text-center space-y-3">
       <div class="inline-flex items-center gap-2 bg-amber-100 text-amber-800 px-4 py-1.5 rounded-full text-sm font-medium">
@@ -96,12 +114,22 @@ async function subscribe() {
         Sans engagement · Annulable à tout moment
       </p>
       <UButton
+        v-if="!isPremium"
         size="lg"
         class="w-full justify-center"
         :loading="isSubscribing"
         @click="subscribe"
       >
         Découvrir Premium
+      </UButton>
+      <UButton
+        v-else
+        size="lg"
+        class="w-full justify-center"
+        variant="outline"
+        to="/profile"
+      >
+        Gérer mon abonnement
       </UButton>
     </div>
 
