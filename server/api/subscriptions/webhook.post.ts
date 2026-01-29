@@ -1,24 +1,21 @@
 import type Stripe from 'stripe'
+import StripeLib from 'stripe'
 import { sql } from 'drizzle-orm'
+
+// Cloudflare Workers requires SubtleCryptoProvider for webhook signature verification
+const cryptoProvider = StripeLib.createSubtleCryptoProvider()
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const stripe = useStripe()
 
-  // Read raw body as Buffer for Stripe signature verification
-  // On Cloudflare Workers, readRawBody may return string - ensure it works
-  const rawBody = await readRawBody(event, false)
-  if (!rawBody) {
-    console.error('Webhook: empty body received')
+  const body = await readRawBody(event)
+  if (!body) {
     throw createError({ statusCode: 400, statusMessage: 'Empty body' })
   }
 
-  // Convert to string if Buffer
-  const body = typeof rawBody === 'string' ? rawBody : new TextDecoder().decode(rawBody)
-
   const signature = getHeader(event, 'stripe-signature')
   if (!signature) {
-    console.error('Webhook: missing stripe-signature header')
     throw createError({ statusCode: 400, statusMessage: 'Missing stripe-signature header' })
   }
 
@@ -28,6 +25,8 @@ export default defineEventHandler(async (event) => {
       body,
       signature,
       config.stripeWebhookSecret,
+      undefined,
+      cryptoProvider,
     )
   }
   catch (err) {
@@ -46,8 +45,6 @@ export default defineEventHandler(async (event) => {
       const userId = session.metadata?.user_id
       const customerId = session.customer as string
 
-      console.log('Checkout completed for user:', userId, 'customer:', customerId)
-
       if (userId) {
         let premiumUntil: string | null = null
         if (session.subscription) {
@@ -62,7 +59,6 @@ export default defineEventHandler(async (event) => {
               stripe_customer_id = ${customerId}
           WHERE id = ${Number(userId)}
         `)
-        console.log('User', userId, 'upgraded to premium until', premiumUntil)
       }
       break
     }
