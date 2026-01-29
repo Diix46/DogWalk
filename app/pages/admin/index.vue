@@ -32,7 +32,7 @@ const { data: stats, status: statsStatus, error: statsError } = await useFetch<S
 const { data: users, status: usersStatus, error: usersError } = await useFetch<AdminUser[]>('/api/admin/users')
 const { data: adminRoutes, status: routesStatus, error: routesError, refresh: refreshRoutes } = await useFetch<AdminRoute[]>('/api/admin/routes')
 
-const { data: adminReviews, status: reviewsStatus, error: reviewsError } = useFetch<AdminReview[]>('/api/admin/reviews', { lazy: true })
+const { data: adminReviews, status: reviewsStatus, error: reviewsError, refresh: refreshReviews } = useFetch<AdminReview[]>('/api/admin/reviews', { lazy: true })
 
 const isLoading = computed(() => statsStatus.value === 'pending' || usersStatus.value === 'pending' || routesStatus.value === 'pending')
 const hasError = computed(() => statsError.value || usersError.value || routesError.value || (activeTab.value === 'reviews' && reviewsError.value))
@@ -70,6 +70,18 @@ const filteredReviews = computed(() => {
 })
 
 const toast = useToast()
+
+async function deleteReview(id: number) {
+  if (!window.confirm('Supprimer cet avis ? Cette action est irréversible.')) return
+  try {
+    await $fetch(`/api/admin/reviews/${id}`, { method: 'DELETE' })
+    toast.add({ title: 'Avis supprimé', color: 'success' })
+    await refreshReviews()
+  }
+  catch {
+    toast.add({ title: 'Erreur lors de la suppression', color: 'error' })
+  }
+}
 
 const resetUserId = ref<number | null>(null)
 const resetPassword = ref('')
@@ -302,7 +314,8 @@ function formatDuration(s: number) {
               <th class="py-2 pr-4">Utilisateur</th>
               <th class="py-2 pr-4">Note</th>
               <th class="py-2 pr-4">Commentaire</th>
-              <th class="py-2">Date</th>
+              <th class="py-2 pr-4">Date</th>
+              <th class="py-2">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -311,7 +324,17 @@ function formatDuration(s: number) {
               <td class="py-2 pr-4 truncate max-w-[160px]">{{ r.user_name || r.user_email }}</td>
               <td class="py-2 pr-4 text-yellow-400 whitespace-nowrap">{{ stars(r.rating) }}</td>
               <td class="py-2 pr-4 truncate max-w-[250px] text-neutral-600">{{ r.comment || '—' }}</td>
-              <td class="py-2 whitespace-nowrap text-neutral-500">{{ formatReviewDate(r.created_at) }}</td>
+              <td class="py-2 pr-4 whitespace-nowrap text-neutral-500">{{ formatReviewDate(r.created_at) }}</td>
+              <td class="py-2">
+                <UButton
+                  size="xs"
+                  variant="ghost"
+                  color="error"
+                  icon="i-heroicons-trash"
+                  aria-label="Supprimer cet avis"
+                  @click="deleteReview(r.id)"
+                />
+              </td>
             </tr>
           </tbody>
         </table>
