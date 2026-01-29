@@ -23,14 +23,51 @@ interface AdminRoute {
   distance_meters: number; walk_count: number; avg_rating: number | null; review_count: number
 }
 
+interface AdminReview {
+  id: number; rating: number; comment: string | null; created_at: number
+  route_name: string; route_id: string; user_name: string | null; user_email: string
+}
+
 const { data: stats, status: statsStatus, error: statsError } = await useFetch<Stats>('/api/admin/stats')
 const { data: users, status: usersStatus, error: usersError } = await useFetch<AdminUser[]>('/api/admin/users')
 const { data: adminRoutes, status: routesStatus, error: routesError, refresh: refreshRoutes } = await useFetch<AdminRoute[]>('/api/admin/routes')
 
+const { data: adminReviews, status: reviewsStatus, error: reviewsError } = useFetch<AdminReview[]>('/api/admin/reviews', { lazy: true })
+
 const isLoading = computed(() => statsStatus.value === 'pending' || usersStatus.value === 'pending' || routesStatus.value === 'pending')
-const hasError = computed(() => statsError.value || usersError.value || routesError.value)
+const hasError = computed(() => statsError.value || usersError.value || routesError.value || (activeTab.value === 'reviews' && reviewsError.value))
 
 const activeTab = ref('stats')
+
+// Reviews tab filtering
+const reviewSearch = ref('')
+const reviewRatingFilter = ref(0)
+
+function stars(rating: number): string {
+  return '★'.repeat(rating) + '☆'.repeat(5 - rating)
+}
+
+function formatReviewDate(timestamp: number): string {
+  return new Date(timestamp * 1000).toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+}
+
+const filteredReviews = computed(() => {
+  if (!adminReviews.value) return []
+  return adminReviews.value.filter((r) => {
+    if (Number(reviewRatingFilter.value) > 0 && r.rating !== Number(reviewRatingFilter.value)) return false
+    if (reviewSearch.value) {
+      const q = reviewSearch.value.toLowerCase()
+      const matchName = r.route_name?.toLowerCase().includes(q)
+      const matchUser = r.user_name?.toLowerCase().includes(q) || r.user_email.toLowerCase().includes(q)
+      if (!matchName && !matchUser) return false
+    }
+    return true
+  })
+})
 
 const toast = useToast()
 
@@ -117,7 +154,7 @@ function formatDuration(s: number) {
     <!-- Tabs -->
     <div class="flex gap-2">
       <UButton
-        v-for="tab in [{ key: 'stats', label: 'Statistiques' }, { key: 'users', label: 'Utilisateurs' }, { key: 'routes', label: 'Parcours' }]"
+        v-for="tab in [{ key: 'stats', label: 'Statistiques' }, { key: 'users', label: 'Utilisateurs' }, { key: 'routes', label: 'Parcours' }, { key: 'reviews', label: 'Avis' }]"
         :key="tab.key"
         :variant="activeTab === tab.key ? 'solid' : 'ghost'"
         size="sm"
@@ -207,6 +244,74 @@ function formatDuration(s: number) {
                   <UButton size="xs" variant="ghost" color="neutral" @click="resetUserId = null">X</UButton>
                 </div>
               </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Reviews Tab -->
+    <div v-if="activeTab === 'reviews'" class="space-y-4">
+      <!-- Header stats -->
+      <div v-if="stats" class="flex items-center gap-4">
+        <p class="text-sm text-neutral-500">
+          {{ stats.reviews.total }} avis au total — note moyenne {{ stats.reviews.avgRating }}★
+        </p>
+      </div>
+
+      <!-- Filters -->
+      <div class="flex flex-wrap gap-3">
+        <input
+          v-model="reviewSearch"
+          type="text"
+          placeholder="Rechercher parcours ou utilisateur…"
+          class="text-sm border border-neutral-300 rounded-lg px-3 py-1.5 w-64"
+        >
+        <select
+          v-model="reviewRatingFilter"
+          class="text-sm border border-neutral-300 rounded-lg px-3 py-1.5"
+        >
+          <option :value="0">Toutes les notes</option>
+          <option v-for="n in 5" :key="n" :value="n">{{ n }} ★</option>
+        </select>
+      </div>
+
+      <!-- Loading -->
+      <div v-if="reviewsStatus === 'pending'" class="flex items-center justify-center py-8">
+        <UIcon name="i-heroicons-arrow-path" class="w-6 h-6 text-primary animate-spin" />
+      </div>
+
+      <!-- Empty -->
+      <div v-else-if="!adminReviews || adminReviews.length === 0" class="text-center py-12">
+        <UIcon name="i-heroicons-star" class="w-10 h-10 text-neutral-400 mx-auto mb-2" />
+        <p class="text-neutral-500">Aucun avis pour le moment</p>
+      </div>
+
+      <!-- No filter results -->
+      <div v-else-if="filteredReviews.length === 0" class="text-center py-8">
+        <p class="text-neutral-500">Aucun avis ne correspond aux filtres</p>
+      </div>
+
+      <!-- Reviews table -->
+      <div v-else class="overflow-x-auto">
+        <p class="text-xs text-neutral-400 mb-2">{{ filteredReviews.length }} résultat(s)</p>
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b text-left text-neutral-500">
+              <th class="py-2 pr-4">Parcours</th>
+              <th class="py-2 pr-4">Utilisateur</th>
+              <th class="py-2 pr-4">Note</th>
+              <th class="py-2 pr-4">Commentaire</th>
+              <th class="py-2">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="r in filteredReviews" :key="r.id" class="border-b border-neutral-100">
+              <td class="py-2 pr-4 truncate max-w-[180px]">{{ r.route_name }}</td>
+              <td class="py-2 pr-4 truncate max-w-[160px]">{{ r.user_name || r.user_email }}</td>
+              <td class="py-2 pr-4 text-yellow-400 whitespace-nowrap">{{ stars(r.rating) }}</td>
+              <td class="py-2 pr-4 truncate max-w-[250px] text-neutral-600">{{ r.comment || '—' }}</td>
+              <td class="py-2 whitespace-nowrap text-neutral-500">{{ formatReviewDate(r.created_at) }}</td>
             </tr>
           </tbody>
         </table>
