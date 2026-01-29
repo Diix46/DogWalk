@@ -20,7 +20,13 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    weatherApiKey: process.env.WEATHER_API_KEY || '',
+    weatherApiKey: '',
+    stripeSecretKey: '',
+    stripeWebhookSecret: '',
+    public: {
+      stripePublicKey: '',
+      appUrl: '',
+    },
   },
 
   css: ['~/assets/css/main.css'],

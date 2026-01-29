@@ -12,9 +12,23 @@ interface Dog {
 
 const { user, clear } = useUserSession()
 const toast = useToast()
+const { isPremium } = usePremium()
 
 const userEmail = computed(() => (user.value as { email?: string } | null)?.email)
 const userName = computed(() => (user.value as { name?: string | null } | null)?.name)
+
+const isManagingSubscription = ref(false)
+async function manageSubscription() {
+  isManagingSubscription.value = true
+  try {
+    const { url } = await $fetch<{ url: string }>('/api/subscriptions/portal', { method: 'POST' })
+    if (url) navigateTo(url, { external: true })
+  }
+  catch { /* silently fail */ }
+  finally {
+    isManagingSubscription.value = false
+  }
+}
 
 // Fetch walking stats
 interface WalkStats {
@@ -160,7 +174,18 @@ async function logout() {
               <UIcon name="i-heroicons-sparkles" class="w-5 h-5 text-neutral-500" />
               <span class="text-neutral-700">Abonnement</span>
             </div>
-            <UBadge color="neutral" variant="subtle">Gratuit</UBadge>
+            <div v-if="isPremium" class="flex items-center gap-2">
+              <UBadge color="warning" variant="subtle">Premium</UBadge>
+              <UButton size="xs" variant="ghost" :loading="isManagingSubscription" @click="manageSubscription">
+                Gérer
+              </UButton>
+            </div>
+            <div v-else class="flex items-center gap-2">
+              <UBadge color="neutral" variant="subtle">Gratuit</UBadge>
+              <UButton size="xs" variant="ghost" to="/premium">
+                Passer Premium
+              </UButton>
+            </div>
           </div>
         </div>
       </UCard>

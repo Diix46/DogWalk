@@ -21,6 +21,7 @@
     "maplibre-gl": "^5.17.0",
     "nuxt": "^4.0.0",
     "nuxt-auth-utils": "^0.5.28",
+    "stripe": "^20.3.0",
     "vue": "^3.5.0",
     "vue-router": "^4.5.0",
     "zod": "^4.3.6"

@@ -7,6 +7,9 @@ export const users = sqliteTable('users', {
   name: text('name'),
   streak_count: integer('streak_count').notNull().default(0),
   last_walk_date: text('last_walk_date'), // YYYY-MM-DD
+  is_premium: integer('is_premium', { mode: 'boolean' }).notNull().default(false),
+  premium_until: text('premium_until'), // ISO date string
+  stripe_customer_id: text('stripe_customer_id'),
   created_at: integer('created_at', { mode: 'timestamp' })
     .notNull()
     .$defaultFn(() => new Date()),

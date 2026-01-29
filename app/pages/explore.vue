@@ -211,10 +211,18 @@ function onMapReady() {
   // Map is ready - could trigger additional logic here
 }
 
+// Premium gating (Story 7.6)
+const { isPremium } = usePremium()
+const showPremiumGate = ref(false)
+
 /**
- * Handle route card click - navigate to route details
+ * Handle route card click - navigate to route details or show premium gate
  */
 function onRouteClick(route: Route) {
+  if (route.is_premium && !isPremium.value) {
+    showPremiumGate.value = true
+    return
+  }
   navigateTo(`/routes/${route.id}`)
 }
 
@@ -409,6 +417,29 @@ useSeoMeta({
         />
       </section>
     </div>
+
+    <!-- Premium Gate Modal (Story 7.6) -->
+    <UModal v-model:open="showPremiumGate">
+      <template #content>
+        <div class="p-6 text-center space-y-4">
+          <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto">
+            <UIcon name="i-heroicons-star" class="w-8 h-8 text-amber-600" />
+          </div>
+          <h3 class="text-xl font-bold text-neutral-900">Parcours Premium</h3>
+          <p class="text-neutral-600">
+            Ce parcours est réservé aux explorateurs Premium. Débloque l'accès à tous les parcours exclusifs !
+          </p>
+          <div class="flex flex-col gap-2">
+            <UButton class="w-full justify-center" @click="navigateTo('/premium')">
+              Découvrir Premium
+            </UButton>
+            <UButton variant="ghost" class="w-full justify-center" @click="showPremiumGate = false">
+              Plus tard
+            </UButton>
+          </div>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 

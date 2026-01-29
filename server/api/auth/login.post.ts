@@ -88,6 +88,7 @@ export default defineEventHandler(async (event) => {
       id: user.id,
       email: user.email,
       name: user.name,
+      is_premium: Boolean(user.is_premium),
     },
   })
 
@@ -96,5 +97,6 @@ export default defineEventHandler(async (event) => {
     id: user.id,
     email: user.email,
     name: user.name,
+    is_premium: Boolean(user.is_premium),
   }
 })
