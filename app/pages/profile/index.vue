@@ -54,6 +54,9 @@ const formattedDuration = computed(() => {
   return `${min} min`
 })
 
+// Fetch user's review count
+const { data: reviewCount } = useFetch<number>('/api/reviews/me/count', { lazy: true })
+
 // Fetch user's dogs
 const { data: dogs, error: dogsError, refresh: refreshDogs } = await useFetch<Dog[]>('/api/dogs')
 
@@ -237,6 +240,17 @@ async function logout() {
       icon="i-heroicons-clock"
     >
       Mon historique de balades
+    </UButton>
+
+    <!-- Reviews link -->
+    <UButton
+      to="/profile/reviews"
+      variant="soft"
+      block
+      icon="i-heroicons-star"
+    >
+      Mes avis
+      <UBadge v-if="reviewCount != null && reviewCount > 0" variant="subtle" size="sm" class="ml-2">{{ reviewCount }}</UBadge>
     </UButton>
 
     <UButton
