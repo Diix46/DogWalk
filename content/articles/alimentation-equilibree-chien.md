@@ -1,8 +1,8 @@
 ---
-title: "L'alimentation équilibrée de votre chien"
-description: "Tout savoir sur les besoins nutritionnels de votre compagnon : protéines, glucides, vitamines et fréquence des repas."
+title: L'alimentation équilibrée de votre chien
 category: nutrition
-publishedAt: "2025-01-20"
+description: "Tout savoir sur les besoins nutritionnels de votre compagnon : protéines, glucides, vitamines et fréquence des repas."
+publishedAt: 2025-01-20
 ---
 
 ## Les bases de la nutrition canine
@@ -15,7 +15,7 @@ Les protéines doivent représenter **25 à 30%** de l'alimentation de votre chi
 
 - Viande (poulet, bœuf, agneau)
 - Poisson (saumon, sardines)
-- Œufs
+- Œufs ...
 
 Les chiots ont besoin de plus de protéines (jusqu'à 35%) pour leur croissance.
 
@@ -29,12 +29,12 @@ Contrairement aux humains, les chiens n'ont pas un besoin élevé en glucides. L
 
 ## Fréquence des repas
 
-| Âge | Repas par jour |
-|-----|---------------|
-| Chiot (2-4 mois) | 3-4 fois |
-| Chiot (4-12 mois) | 2-3 fois |
-| Adulte | 2 fois |
-| Senior | 2 fois (portions réduites) |
+| Âge               | Repas par jour             |
+| ----------------- | -------------------------- |
+| Chiot (2-4 mois)  | 3-4 fois                   |
+| Chiot (4-12 mois) | 2-3 fois                   |
+| Adulte            | 2 fois                     |
+| Senior            | 2 fois (portions réduites) |
 
 ## Aliments à éviter absolument
 
