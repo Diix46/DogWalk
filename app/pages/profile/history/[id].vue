@@ -70,13 +70,13 @@ useSeoMeta({
   <div class="space-y-6 lg:max-w-2xl lg:mx-auto">
     <!-- Loading -->
     <div v-if="isLoading" class="flex flex-col items-center justify-center py-16">
-      <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 text-primary animate-spin mb-3" />
+      <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-primary animate-spin mb-3" />
       <p class="text-neutral-600">Chargement...</p>
     </div>
 
     <!-- Error -->
     <div v-else-if="error" class="text-center py-16">
-      <UIcon name="i-heroicons-exclamation-triangle" class="w-12 h-12 text-warning mb-3" />
+      <UIcon name="i-lucide-alert-triangle" class="w-12 h-12 text-warning mb-3" />
       <p class="text-neutral-600 font-medium">Balade introuvable</p>
       <UButton to="/profile/history" variant="outline" class="mt-4">
         Retour à l'historique
@@ -90,11 +90,11 @@ useSeoMeta({
         <UButton
           to="/profile/history"
           variant="ghost"
-          icon="i-heroicons-arrow-left"
+          icon="i-lucide-arrow-left"
           aria-label="Retour"
         />
         <div class="flex-1">
-          <h1 class="text-2xl font-bold text-neutral-900">
+          <h1 class="text-2xl font-bold text-forest-700">
             {{ routeData?.name || 'Balade' }}
           </h1>
           <p class="text-sm text-neutral-500">{{ formattedDate }}</p>
@@ -117,15 +117,15 @@ useSeoMeta({
       <!-- Stats -->
       <div class="grid grid-cols-2 gap-4">
         <div class="bg-neutral-50 rounded-xl p-4 text-center">
-          <UIcon name="i-heroicons-clock" class="w-6 h-6 text-primary mx-auto mb-2" />
-          <div class="text-2xl font-bold text-neutral-900">
+          <UIcon name="i-lucide-clock" class="w-6 h-6 text-spring-500 mx-auto mb-2" />
+          <div class="text-2xl font-bold text-spring-500">
             {{ formatDuration(walkData.duration_seconds) }}
           </div>
           <div class="text-sm text-neutral-500">Durée</div>
         </div>
         <div class="bg-neutral-50 rounded-xl p-4 text-center">
-          <UIcon name="i-heroicons-map-pin" class="w-6 h-6 text-primary mx-auto mb-2" />
-          <div class="text-2xl font-bold text-neutral-900">
+          <UIcon name="i-lucide-map-pin" class="w-6 h-6 text-spring-500 mx-auto mb-2" />
+          <div class="text-2xl font-bold text-spring-500">
             {{ formatDistance(walkData.distance_meters) }}
           </div>
           <div class="text-sm text-neutral-500">Distance</div>
@@ -136,7 +136,7 @@ useSeoMeta({
       <div class="bg-neutral-50 rounded-lg p-4">
         <div class="flex items-center gap-2">
           <UIcon
-            :name="walkData.status === 'completed' ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle'"
+            :name="walkData.status === 'completed' ? 'i-lucide-check-circle' : 'i-lucide-x-circle'"
             :class="walkData.status === 'completed' ? 'text-success' : 'text-neutral-400'"
             class="w-5 h-5"
           />

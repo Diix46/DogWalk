@@ -52,8 +52,8 @@ export default defineNuxtConfig({
       name: 'DogWalk',
       short_name: 'DogWalk',
       description: 'Trouve les meilleures balades pour ton chien',
-      theme_color: '#2563eb',
-      background_color: '#fafafa',
+      theme_color: '#1B4332',
+      background_color: '#FAFAF5',
       display: 'standalone',
       start_url: '/',
       icons: [

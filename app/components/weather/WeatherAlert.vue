@@ -36,19 +36,19 @@ const alertConfig = computed(() => {
   switch (severity.value) {
     case 'red':
       return {
-        icon: 'i-heroicons-exclamation-triangle',
+        icon: 'i-lucide-alert-triangle',
         color: 'error' as const,
         message: 'Conditions défavorables prévues pendant votre balade',
       }
     case 'orange':
       return {
-        icon: 'i-heroicons-exclamation-circle',
+        icon: 'i-lucide-alert-circle',
         color: 'warning' as const,
         message: 'Conditions moyennes — restez vigilant',
       }
     default:
       return {
-        icon: 'i-heroicons-check-circle',
+        icon: 'i-lucide-check-circle',
         color: 'success' as const,
         message: 'Conditions favorables pour la balade',
       }

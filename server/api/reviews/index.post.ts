@@ -6,7 +6,7 @@ const reviewSchema = z.object({
   route_id: z.string().min(1, 'route_id requis'),
   walk_id: z.number().optional(),
   rating: z.number().int().min(1).max(5, 'Rating entre 1 et 5'),
-  comment: z.string().max(1000).optional(),
+  comment: z.string().max(1000).nullish(),
 })
 
 export default defineEventHandler(async (event) => {

@@ -15,7 +15,7 @@ const toast = useToast()
 const { isPremium } = usePremium()
 
 const userEmail = computed(() => (user.value as { email?: string } | null)?.email)
-const userName = computed(() => (user.value as { name?: string | null } | null)?.name)
+const userName = computed(() => (user.value as { username?: string | null } | null)?.username)
 
 const isManagingSubscription = ref(false)
 async function manageSubscription() {
@@ -84,12 +84,41 @@ async function logout() {
   await clear()
 
   toast.add({
-    title: 'À bientôt !',
-    icon: 'i-heroicons-hand-raised',
+    title: 'A bientot !',
+    icon: 'i-lucide-check-circle',
     color: 'info',
   })
 
-  await navigateTo('/login')
+  await navigateTo('/explore')
+}
+
+// Delete account (RGPD)
+const showDeleteModal = ref(false)
+const isDeletingAccount = ref(false)
+
+async function deleteAccount() {
+  isDeletingAccount.value = true
+  try {
+    await $fetch('/api/auth/delete-account', { method: 'POST' })
+    await clear()
+
+    toast.add({
+      title: 'Compte supprime avec succes.',
+      icon: 'i-lucide-check-circle',
+      color: 'success',
+    })
+
+    await navigateTo('/explore')
+  } catch {
+    toast.add({
+      title: 'Erreur lors de la suppression du compte.',
+      icon: 'i-lucide-alert-circle',
+      color: 'error',
+    })
+  } finally {
+    isDeletingAccount.value = false
+    showDeleteModal.value = false
+  }
 }
 </script>
 
@@ -97,9 +126,9 @@ async function logout() {
   <div class="space-y-6 lg:max-w-2xl lg:mx-auto">
     <div class="text-center py-8 lg:py-12">
       <div class="w-20 h-20 lg:w-24 lg:h-24 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-        <UIcon name="i-heroicons-user" class="w-10 h-10 lg:w-12 lg:h-12 text-primary-600" />
+        <UIcon name="i-lucide-user" class="w-10 h-10 lg:w-12 lg:h-12 text-primary-600" />
       </div>
-      <h1 class="text-2xl lg:text-3xl font-bold text-neutral-900">
+      <h1 class="text-2xl lg:text-3xl font-bold text-forest-700">
         {{ userName || 'Mon Profil' }}
       </h1>
       <p class="text-neutral-600 lg:text-lg">
@@ -113,9 +142,9 @@ async function logout() {
       <UCard v-if="hasDog && firstDog">
         <template #header>
           <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-neutral-900">Mon chien</h2>
+            <h2 class="font-semibold text-forest-700">Mon chien</h2>
             <NuxtLink :to="`/dogs/${firstDog.id}/edit`">
-              <UButton size="xs" variant="ghost" icon="i-heroicons-pencil">
+              <UButton size="xs" variant="ghost" icon="i-lucide-pencil">
                 Modifier
               </UButton>
             </NuxtLink>
@@ -129,7 +158,7 @@ async function logout() {
           <div>
             <h3 class="text-lg font-semibold text-neutral-900">{{ firstDog.name }}</h3>
             <p class="text-neutral-600">
-              {{ firstDog.breed || 'Race non renseignée' }}
+              {{ firstDog.breed || 'Race non renseignee' }}
               <span v-if="firstDog.birth_date"> · {{ calculateAge(firstDog.birth_date) }}</span>
             </p>
           </div>
@@ -146,10 +175,10 @@ async function logout() {
             Ajoute ton compagnon !
           </h3>
           <p class="text-neutral-600 mb-4">
-            Enregistre ton chien pour personnaliser ton expérience DogWalk
+            Enregistre ton chien pour personnaliser ton experience DogWalk
           </p>
           <NuxtLink to="/dogs/new">
-            <UButton icon="i-heroicons-plus">
+            <UButton icon="i-lucide-plus">
               Ajouter mon chien
             </UButton>
           </NuxtLink>
@@ -158,13 +187,13 @@ async function logout() {
 
       <UCard>
         <template #header>
-          <h2 class="font-semibold text-neutral-900">Mon compte</h2>
+          <h2 class="font-semibold text-forest-700">Mon compte</h2>
         </template>
 
         <div class="space-y-4">
           <div class="flex items-center justify-between py-2">
             <div class="flex items-center gap-3">
-              <UIcon name="i-heroicons-envelope" class="w-5 h-5 text-neutral-500" />
+              <UIcon name="i-lucide-mail" class="w-5 h-5 text-neutral-500" />
               <span class="text-neutral-700">Email</span>
             </div>
             <span class="text-neutral-500 text-sm truncate ml-4">{{ userEmail }}</span>
@@ -174,13 +203,13 @@ async function logout() {
 
           <div class="flex items-center justify-between py-2">
             <div class="flex items-center gap-3">
-              <UIcon name="i-heroicons-sparkles" class="w-5 h-5 text-neutral-500" />
+              <UIcon name="i-lucide-sparkles" class="w-5 h-5 text-neutral-500" />
               <span class="text-neutral-700">Abonnement</span>
             </div>
             <div v-if="isPremium" class="flex items-center gap-2">
               <UBadge color="warning" variant="subtle">Premium</UBadge>
               <UButton size="xs" variant="ghost" :loading="isManagingSubscription" @click="manageSubscription">
-                Gérer
+                Gerer
               </UButton>
             </div>
             <div v-else class="flex items-center gap-2">
@@ -198,14 +227,14 @@ async function logout() {
     <UAlert
       v-if="statsError"
       color="warning"
-      icon="i-heroicons-exclamation-triangle"
+      icon="i-lucide-alert-triangle"
       title="Impossible de charger les statistiques"
     />
     <UAlert
       v-if="dogsError"
       color="warning"
-      icon="i-heroicons-exclamation-triangle"
-      title="Impossible de charger les données du chien"
+      icon="i-lucide-alert-triangle"
+      title="Impossible de charger les donnees du chien"
     />
 
     <!-- Streak -->
@@ -214,20 +243,20 @@ async function logout() {
     <!-- Stats this month -->
     <UCard>
       <template #header>
-        <h2 class="font-semibold text-neutral-900">Ce mois-ci</h2>
+        <h2 class="font-semibold text-forest-700">Ce mois-ci</h2>
       </template>
       <div class="grid grid-cols-3 gap-4 text-center">
         <div>
-          <p class="text-2xl font-bold text-primary">{{ formattedWalks }}</p>
+          <p class="text-2xl font-bold text-spring-500">{{ formattedWalks }}</p>
           <p class="text-sm text-neutral-600">{{ (stats?.totalWalks ?? 0) <= 1 ? 'Balade' : 'Balades' }}</p>
         </div>
         <div>
-          <p class="text-2xl font-bold text-primary">{{ formattedDistance }}</p>
+          <p class="text-2xl font-bold text-spring-500">{{ formattedDistance }}</p>
           <p class="text-sm text-neutral-600">Parcourus</p>
         </div>
         <div>
-          <p class="text-2xl font-bold text-primary">{{ formattedDuration }}</p>
-          <p class="text-sm text-neutral-600">Durée totale</p>
+          <p class="text-2xl font-bold text-spring-500">{{ formattedDuration }}</p>
+          <p class="text-sm text-neutral-600">Duree totale</p>
         </div>
       </div>
     </UCard>
@@ -237,7 +266,7 @@ async function logout() {
       to="/profile/history"
       variant="soft"
       block
-      icon="i-heroicons-clock"
+      icon="i-lucide-clock"
     >
       Mon historique de balades
     </UButton>
@@ -247,7 +276,7 @@ async function logout() {
       to="/profile/reviews"
       variant="soft"
       block
-      icon="i-heroicons-star"
+      icon="i-lucide-star"
     >
       Mes avis
       <UBadge v-if="reviewCount != null && reviewCount > 0" variant="subtle" size="sm" class="ml-2">{{ reviewCount }}</UBadge>
@@ -257,10 +286,47 @@ async function logout() {
       color="error"
       variant="soft"
       block
-      icon="i-heroicons-arrow-right-on-rectangle"
+      icon="i-lucide-log-out"
       @click="logout"
     >
-      Se déconnecter
+      Se deconnecter
     </UButton>
+
+    <!-- RGPD: Delete account -->
+    <div class="pt-6 border-t border-neutral-200">
+      <h3 class="text-sm font-semibold text-neutral-500 mb-3">Zone de danger</h3>
+      <UButton
+        color="error"
+        variant="soft"
+        block
+        icon="i-lucide-trash-2"
+        @click="showDeleteModal = true"
+      >
+        Supprimer mon compte
+      </UButton>
+    </div>
+
+    <UModal v-model:open="showDeleteModal">
+      <template #content>
+        <div class="p-6 space-y-4">
+          <h2 class="text-lg font-bold text-neutral-900">Supprimer definitivement ton compte ?</h2>
+          <p class="text-neutral-600">
+            Toutes tes donnees seront supprimees (balades, avis, chiens). Cette action est irreversible.
+          </p>
+          <div class="flex gap-3 justify-end">
+            <UButton variant="ghost" @click="showDeleteModal = false">
+              Annuler
+            </UButton>
+            <UButton
+              color="error"
+              :loading="isDeletingAccount"
+              @click="deleteAccount"
+            >
+              Supprimer
+            </UButton>
+          </div>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>

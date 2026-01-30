@@ -7,11 +7,11 @@
  */
 
 const categories = [
-  { value: 'sante', label: 'Santé', icon: 'i-heroicons-heart' },
-  { value: 'nutrition', label: 'Nutrition', icon: 'i-heroicons-cake' },
-  { value: 'comportement', label: 'Comportement', icon: 'i-heroicons-academic-cap' },
-  { value: 'equipement', label: 'Équipement', icon: 'i-heroicons-wrench-screwdriver' },
-  { value: 'races', label: 'Races', icon: 'i-heroicons-identification' },
+  { value: 'sante', label: 'Santé', icon: 'i-lucide-heart' },
+  { value: 'nutrition', label: 'Nutrition', icon: 'i-lucide-cake' },
+  { value: 'comportement', label: 'Comportement', icon: 'i-lucide-graduation-cap' },
+  { value: 'equipement', label: 'Équipement', icon: 'i-lucide-wrench' },
+  { value: 'races', label: 'Races', icon: 'i-lucide-id-card' },
 ]
 
 const selectedCategory = ref<string | null>(null)
@@ -42,7 +42,7 @@ function getCategoryLabel(cat: string): string {
 }
 
 function getCategoryIcon(cat: string): string {
-  return categories.find(c => c.value === cat)?.icon || 'i-heroicons-tag'
+  return categories.find(c => c.value === cat)?.icon || 'i-lucide-tag'
 }
 
 definePageMeta({ layout: 'default' })
@@ -60,7 +60,7 @@ useSeoMeta({
 <template>
   <div class="space-y-6">
     <div>
-      <h1 class="text-2xl lg:text-3xl font-bold text-neutral-900">Articles</h1>
+      <h1 class="text-2xl lg:text-3xl font-bold text-forest-700">Articles</h1>
       <p class="text-neutral-600 text-sm lg:text-base">
         Conseils et astuces pour le bien-être de votre compagnon
       </p>
@@ -72,7 +72,7 @@ useSeoMeta({
         v-for="cat in categories"
         :key="cat.value"
         :variant="selectedCategory === cat.value ? 'solid' : 'outline'"
-        :color="selectedCategory === cat.value ? 'primary' : 'neutral'"
+        :color="selectedCategory === cat.value ? 'spring' : 'neutral'"
         size="sm"
         class="rounded-full"
         @click="toggleCategory(cat.value)"
@@ -101,15 +101,15 @@ useSeoMeta({
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           >
         </div>
-        <div v-else class="aspect-video bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
-          <UIcon name="i-heroicons-document-text" class="w-12 h-12 text-primary/30" />
+        <div v-else class="aspect-video bg-gradient-to-br from-spring-500/10 to-spring-500/5 flex items-center justify-center">
+          <UIcon name="i-lucide-file-text" class="w-12 h-12 text-spring-500/30" />
         </div>
 
         <!-- Content -->
         <div class="p-4 space-y-2">
           <!-- Category + Date -->
           <div class="flex items-center gap-2 text-xs text-neutral-500">
-            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-spring-500/10 text-spring-600 font-medium">
               <UIcon :name="getCategoryIcon(article.category)" class="w-3 h-3" />
               {{ getCategoryLabel(article.category) }}
             </span>
@@ -117,7 +117,7 @@ useSeoMeta({
           </div>
 
           <!-- Title -->
-          <h2 class="font-semibold text-neutral-900 group-hover:text-primary transition-colors line-clamp-2">
+          <h2 class="font-semibold text-forest-700 group-hover:text-spring-500 transition-colors line-clamp-2">
             {{ article.title }}
           </h2>
 
@@ -131,7 +131,7 @@ useSeoMeta({
 
     <!-- Empty State -->
     <div v-else class="text-center py-12">
-      <UIcon name="i-heroicons-document-text" class="w-12 h-12 text-neutral-400 mx-auto mb-3" />
+      <UIcon name="i-lucide-file-text" class="w-12 h-12 text-neutral-400 mx-auto mb-3" />
       <p class="text-neutral-600 font-medium">Aucun article trouvé</p>
       <p class="text-neutral-500 text-sm mt-1">
         Revenez bientôt pour découvrir nos conseils !

@@ -78,14 +78,14 @@ export const DIFFICULTY_CONFIG: Record<DifficultyLevel, { label: string; colorCl
 export const ROUTE_TYPE_CONFIG: Record<RouteType, { label: string; icon: string }> = {
   urban: {
     label: 'Urbain',
-    icon: 'i-heroicons-building-office-2',
+    icon: 'i-lucide-building-2',
   },
   nature: {
     label: 'Nature',
-    icon: 'i-heroicons-sparkles',
+    icon: 'i-lucide-trees',
   },
   mixed: {
     label: 'Mixte',
-    icon: 'i-heroicons-arrows-right-left',
+    icon: 'i-lucide-shuffle',
   },
 }

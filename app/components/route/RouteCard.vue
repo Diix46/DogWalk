@@ -130,7 +130,7 @@ const ariaLabel = computed(() => {
       transition-all duration-200
       motion-safe:hover:scale-[1.02]
       motion-safe:active:scale-[0.98]
-      focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-spring-500 focus-visible:ring-offset-2
       cursor-pointer
       p-4
       min-h-[44px]
@@ -145,10 +145,10 @@ const ariaLabel = computed(() => {
       class="absolute top-3 right-3"
     >
       <span
-        class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary text-xs font-medium"
+        class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-spring-500/10 text-spring-600 text-xs font-medium"
         role="status"
       >
-        <UIcon name="i-heroicons-star-solid" class="w-3 h-3" aria-hidden="true" />
+        <UIcon name="i-lucide-star" class="w-3 h-3" aria-hidden="true" />
         <span>Premium</span>
       </span>
     </div>
@@ -156,26 +156,26 @@ const ariaLabel = computed(() => {
     <!-- Card Content -->
     <div class="flex flex-col gap-3">
       <!-- Route Name -->
-      <h3 class="text-lg font-semibold text-neutral-900 line-clamp-2">
+      <h3 class="text-lg font-semibold text-forest-700 line-clamp-2">
         {{ route.name }}
       </h3>
 
       <!-- Duration and Distance -->
       <div class="flex items-center gap-4 text-sm text-neutral-600">
         <span class="inline-flex items-center gap-1">
-          <UIcon name="i-heroicons-clock" class="w-4 h-4" />
+          <UIcon name="i-lucide-clock" class="w-4 h-4" />
           {{ formatDuration(route.duration_minutes) }}
         </span>
         <span class="inline-flex items-center gap-1">
-          <UIcon name="i-heroicons-map-pin" class="w-4 h-4" />
+          <UIcon name="i-lucide-map-pin" class="w-4 h-4" />
           {{ formatDistance(route.distance_meters) }}
         </span>
         <!-- Distance from user (Story 3.6) -->
         <span
           v-if="hasDistanceFromUser"
-          class="inline-flex items-center gap-1 text-primary"
+          class="inline-flex items-center gap-1 text-spring-500"
         >
-          <UIcon name="i-heroicons-arrow-trending-up" class="w-4 h-4" />
+          <UIcon name="i-lucide-trending-up" class="w-4 h-4" />
           {{ formatDistanceFromUser(route.distance_from_user!) }}
         </span>
         <!-- Rating -->

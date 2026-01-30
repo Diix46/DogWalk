@@ -38,6 +38,15 @@ const locationBannerDismissed = ref(false)
 // Type filter for route filtering (Story 3.7)
 const selectedType = ref<RouteType | null>(null)
 
+// Sorting (Story 3-4)
+type SortOption = 'proximity' | 'rating' | 'popularity'
+const selectedSort = ref<SortOption>('popularity')
+const sortOptions: Array<{ value: SortOption; label: string }> = [
+  { value: 'proximity', label: 'Proximite' },
+  { value: 'rating', label: 'Meilleure note' },
+  { value: 'popularity', label: 'Popularite' },
+]
+
 // Type filter options using existing config
 const typeFilters = Object.entries(ROUTE_TYPE_CONFIG).map(([value, config]) => ({
   value: value as RouteType,
@@ -102,6 +111,11 @@ const apiUrl = computed(() => {
   // Type filter (Story 3.7)
   if (selectedType.value) {
     params.set('type', selectedType.value)
+  }
+
+  // Sort (Story 3-4)
+  if (selectedSort.value) {
+    params.set('sort', selectedSort.value)
   }
 
   // Use discover endpoint when geolocation available (Story 9.5)
@@ -244,7 +258,7 @@ useSeoMeta({
     <!-- Header with duration filter -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl lg:text-3xl font-bold text-neutral-900">Explorer</h1>
+        <h1 class="text-2xl lg:text-3xl font-bold text-forest-700">Explorer</h1>
         <p v-if="selectedDuration" class="text-neutral-600 text-sm lg:text-base">
           Parcours de {{ selectedDuration >= 60 ? '1h+' : `${selectedDuration} min` }}
         </p>
@@ -259,7 +273,7 @@ useSeoMeta({
         <UButton
           to="/"
           variant="ghost"
-          icon="i-heroicons-arrow-left"
+          icon="i-lucide-arrow-left"
           aria-label="Retour à l'accueil"
           class="lg:hidden"
         />
@@ -269,17 +283,17 @@ useSeoMeta({
     <!-- Location Permission Banner (Story 3.6 - AC#4) -->
     <div
       v-if="showLocationBanner"
-      class="flex items-center justify-between gap-3 p-3 bg-primary/5 border border-primary/20 rounded-lg"
+      class="flex items-center justify-between gap-3 p-3 bg-spring-500/5 border border-spring-500/20 rounded-lg"
       role="alert"
     >
       <div class="flex items-center gap-2 text-sm text-neutral-700">
-        <UIcon name="i-heroicons-map-pin" class="w-5 h-5 text-primary flex-shrink-0" />
+        <UIcon name="i-lucide-map-pin" class="w-5 h-5 text-spring-500 flex-shrink-0" />
         <span>Active la localisation pour voir les parcours près de toi</span>
       </div>
       <UButton
         variant="ghost"
         size="xs"
-        icon="i-heroicons-x-mark"
+        icon="i-lucide-x"
         aria-label="Fermer"
         @click="dismissLocationBanner"
       />
@@ -302,7 +316,7 @@ useSeoMeta({
             v-for="filter in typeFilters"
             :key="filter.value"
             :variant="selectedType === filter.value ? 'solid' : 'outline'"
-            :color="selectedType === filter.value ? 'primary' : 'neutral'"
+            :color="selectedType === filter.value ? 'success' : 'neutral'"
             size="sm"
             class="rounded-full"
             @click="toggleTypeFilter(filter.value)"
@@ -322,9 +336,25 @@ useSeoMeta({
           Effacer les filtres
         </UButton>
       </section>
+
+      <!-- Sort dropdown (Story 3-4) -->
+      <section aria-label="Trier les parcours" class="mt-4 lg:mt-0 lg:ml-auto">
+        <div class="flex items-center gap-2">
+          <UIcon name="i-lucide-arrow-up-down" class="w-4 h-4 text-neutral-500" />
+          <select
+            v-model="selectedSort"
+            class="text-sm bg-white border border-neutral-200 rounded-lg px-3 py-1.5 text-neutral-700 focus:outline-none focus:ring-2 focus:ring-spring-500"
+            aria-label="Trier par"
+          >
+            <option v-for="opt in sortOptions" :key="opt.value" :value="opt.value">
+              {{ opt.label }}
+            </option>
+          </select>
+        </div>
+      </section>
     </div>
 
-    <h2 id="routes-heading" class="text-lg lg:text-xl font-semibold text-neutral-900">
+    <h2 id="routes-heading" class="text-lg lg:text-xl font-semibold text-forest-700">
       Parcours recommandés
     </h2>
 
@@ -338,8 +368,8 @@ useSeoMeta({
           class="text-center py-8"
         >
           <UIcon
-            name="i-heroicons-arrow-path"
-            class="w-8 h-8 text-primary animate-spin mx-auto mb-3"
+            name="i-lucide-loader-2"
+            class="w-8 h-8 text-spring-500 animate-spin mx-auto mb-3"
           />
           <p class="text-neutral-600">Chargement des parcours...</p>
         </div>
@@ -350,7 +380,7 @@ useSeoMeta({
           class="text-center py-8"
         >
           <UIcon
-            name="i-heroicons-exclamation-triangle"
+            name="i-lucide-alert-triangle"
             class="w-12 h-12 text-warning mx-auto mb-3"
           />
           <p class="text-neutral-600">
@@ -388,7 +418,7 @@ useSeoMeta({
           class="text-center py-8"
         >
           <UIcon
-            name="i-heroicons-map"
+            name="i-lucide-map"
             class="w-12 h-12 text-neutral-400 mx-auto mb-3"
           />
           <p class="text-neutral-600 font-medium">
@@ -425,7 +455,7 @@ useSeoMeta({
       <template #content>
         <div class="p-6 text-center space-y-4">
           <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto">
-            <UIcon name="i-heroicons-star" class="w-8 h-8 text-amber-600" />
+            <UIcon name="i-lucide-star" class="w-8 h-8 text-amber-600" />
           </div>
           <h3 class="text-xl font-bold text-neutral-900">Parcours Premium</h3>
           <p class="text-neutral-600">

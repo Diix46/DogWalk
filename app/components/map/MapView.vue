@@ -51,6 +51,7 @@ const emit = defineEmits<{
 const mapContainer = ref<HTMLElement>()
 const map = shallowRef<maplibregl.Map>()
 const isLoading = ref(true)
+const mapError = ref(false)
 const isLocating = ref(false)
 const locationError = ref<string>()
 
@@ -88,39 +89,51 @@ const osmStyle: maplibregl.StyleSpecification = {
 onMounted(() => {
   if (!mapContainer.value) return
 
-  const mapInstance = new maplibregl.Map({
-    container: mapContainer.value,
-    style: osmStyle,
-    center: props.center,
-    zoom: props.zoom,
-  })
+  try {
+    const mapInstance = new maplibregl.Map({
+      container: mapContainer.value,
+      style: osmStyle,
+      center: props.center,
+      zoom: props.zoom,
+    })
 
-  // Add navigation controls
-  mapInstance.addControl(new maplibregl.NavigationControl(), 'top-right')
+    // Handle map error
+    mapInstance.on('error', () => {
+      mapError.value = true
+      isLoading.value = false
+    })
 
-  // Handle map load
-  mapInstance.on('load', () => {
+    // Add navigation controls
+    mapInstance.addControl(new maplibregl.NavigationControl(), 'top-right')
+
+    // Handle map load
+    mapInstance.on('load', () => {
+      isLoading.value = false
+      emit('ready', mapInstance)
+
+      // Add route if provided
+      if (props.route) {
+        addRouteLayer(mapInstance, props.route)
+      }
+    })
+
+    // Handle move end
+    mapInstance.on('moveend', () => {
+      const center = mapInstance.getCenter()
+      emit('moveend', [center.lng, center.lat], mapInstance.getZoom())
+    })
+
+    // Handle click
+    mapInstance.on('click', (e) => {
+      emit('click', [e.lngLat.lng, e.lngLat.lat])
+    })
+
+    map.value = mapInstance
+  }
+  catch {
+    mapError.value = true
     isLoading.value = false
-    emit('ready', mapInstance)
-
-    // Add route if provided
-    if (props.route) {
-      addRouteLayer(mapInstance, props.route)
-    }
-  })
-
-  // Handle move end
-  mapInstance.on('moveend', () => {
-    const center = mapInstance.getCenter()
-    emit('moveend', [center.lng, center.lat], mapInstance.getZoom())
-  })
-
-  // Handle click
-  mapInstance.on('click', (e) => {
-    emit('click', [e.lngLat.lng, e.lngLat.lat])
-  })
-
-  map.value = mapInstance
+  }
 })
 
 /**
@@ -353,20 +366,32 @@ function skipToContent() {
       href="#map-content-after"
       class="
         sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-20
-        bg-white px-3 py-2 rounded-lg shadow-card text-primary font-medium
+        bg-white px-3 py-2 rounded-lg shadow-card text-spring-500 font-medium
       "
       @click.prevent="skipToContent"
     >
       Passer la carte
     </a>
 
+    <!-- Map error fallback -->
+    <div
+      v-if="mapError"
+      class="absolute inset-0 z-10 bg-warmGray-50 flex items-center justify-center"
+    >
+      <div class="text-center p-6">
+        <UIcon name="i-lucide-map-off" class="w-12 h-12 text-neutral-400 mx-auto mb-3" />
+        <p class="text-neutral-600 font-medium">Carte temporairement indisponible</p>
+        <p class="text-neutral-500 text-sm mt-1">Veuillez recharger la page ou reessayer plus tard.</p>
+      </div>
+    </div>
+
     <!-- Loading overlay -->
     <div
-      v-if="isLoading"
+      v-if="isLoading && !mapError"
       class="absolute inset-0 z-10 bg-neutral-100 flex items-center justify-center"
     >
       <div class="text-center">
-        <UIcon name="i-heroicons-map" class="w-12 h-12 text-neutral-400 animate-pulse" />
+        <UIcon name="i-lucide-map" class="w-12 h-12 text-neutral-400 animate-pulse" />
         <p class="mt-2 text-neutral-500 text-sm">Chargement de la carte...</p>
       </div>
     </div>
@@ -392,15 +417,15 @@ function skipToContent() {
         hover:shadow-card-hover
         flex items-center justify-center
         transition-all duration-200
-        focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
+        focus:outline-none focus-visible:ring-2 focus-visible:ring-spring-500 focus-visible:ring-offset-2
         disabled:opacity-50 disabled:cursor-wait
       "
       @click="recenter"
     >
       <UIcon
-        :name="isLocating ? 'i-heroicons-arrow-path' : 'i-heroicons-map-pin'"
+        :name="isLocating ? 'i-lucide-loader-2' : 'i-lucide-locate'"
         :class="[
-          'w-6 h-6 text-primary',
+          'w-6 h-6 text-spring-500',
           isLocating && 'animate-spin'
         ]"
       />

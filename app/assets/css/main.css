@@ -1,8 +1,61 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
-/* Direction B Custom Tokens */
-@theme {
+/* Komoot Spirit Design Tokens */
+@theme static {
+  /* Forest palette (primary) — hero: 700 = #1B4332 */
+  --color-forest-50: #edf5f0;
+  --color-forest-100: #d4e8da;
+  --color-forest-200: #a8d1b5;
+  --color-forest-300: #7dba90;
+  --color-forest-400: #52a36b;
+  --color-forest-500: #2D6A4F;
+  --color-forest-600: #245a42;
+  --color-forest-700: #1B4332;
+  --color-forest-800: #143324;
+  --color-forest-900: #0d2218;
+  --color-forest-950: #07110c;
+
+  /* Spring palette (secondary) — hero: 500 = #52B788, avoids Tailwind 'lime' collision */
+  --color-spring-50: #edfaf2;
+  --color-spring-100: #d1f2de;
+  --color-spring-200: #a3e5bd;
+  --color-spring-300: #74C69D;
+  --color-spring-400: #63c496;
+  --color-spring-500: #52B788;
+  --color-spring-600: #40a576;
+  --color-spring-700: #358c64;
+  --color-spring-800: #2a7352;
+  --color-spring-900: #1f5a40;
+  --color-spring-950: #0a2117;
+
+  /* Ochre palette (accent) — hero: 500 = #C9A227 */
+  --color-ochre-50: #fdf9eb;
+  --color-ochre-100: #f9efcc;
+  --color-ochre-200: #f3df99;
+  --color-ochre-300: #edcf66;
+  --color-ochre-400: #D4B44A;
+  --color-ochre-500: #C9A227;
+  --color-ochre-600: #a88820;
+  --color-ochre-700: #876d1a;
+  --color-ochre-800: #665313;
+  --color-ochre-900: #45380d;
+  --color-ochre-950: #231c06;
+
+  /* Warm Gray palette (neutral) — warm-white: 50 = #FAFAF5 */
+  --color-warmGray-50: #FAFAF5;
+  --color-warmGray-100: #F5F5F0;
+  --color-warmGray-200: #E8E8E0;
+  --color-warmGray-300: #D0D0C4;
+  --color-warmGray-400: #B8B8A8;
+  --color-warmGray-500: #95957E;
+  --color-warmGray-600: #6B6B5E;
+  --color-warmGray-700: #52524A;
+  --color-warmGray-800: #3A3A34;
+  --color-warmGray-900: #2A2A24;
+  --color-warmGray-950: #15150F;
+
+  /* Custom shadows */
   --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.08);
   --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
 }

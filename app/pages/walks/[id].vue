@@ -125,7 +125,7 @@ watch(weatherDegraded, (degraded) => {
     toast.add({
       title: 'Météo dégradée',
       description: `${walkWeather.value?.description || 'Conditions défavorables'} — restez vigilant`,
-      icon: 'i-heroicons-cloud-arrow-down',
+      icon: 'i-lucide-cloud-rain',
       color: 'warning',
     })
   }
@@ -229,7 +229,7 @@ async function handleFinishWalk() {
     toast.add({
       title: 'Impossible de terminer la balade',
       description: 'Réessaie dans quelques instants.',
-      icon: 'i-heroicons-exclamation-triangle',
+      icon: 'i-lucide-alert-triangle',
       color: 'error',
     })
     isFinishing.value = false
@@ -276,6 +276,7 @@ function dismissDeviationAlert() {
 // Page meta - no layout for fullscreen experience
 definePageMeta({
   layout: false,
+  middleware: 'auth',
 })
 
 useSeoMeta({
@@ -284,11 +285,11 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="fixed inset-0 flex flex-col bg-white">
+  <div class="fixed inset-0 flex flex-col bg-warmGray-50">
     <!-- Error State -->
     <div v-if="walkError" class="flex-1 flex flex-col items-center justify-center p-6">
       <UIcon
-        name="i-heroicons-exclamation-triangle"
+        name="i-lucide-alert-triangle"
         class="w-12 h-12 text-warning mb-3"
       />
       <p class="text-neutral-600 font-medium">Balade introuvable</p>
@@ -307,7 +308,7 @@ useSeoMeta({
       class="flex-1 flex flex-col items-center justify-center p-6"
     >
       <UIcon
-        name="i-heroicons-check-circle"
+        name="i-lucide-check-circle"
         class="w-12 h-12 text-success mb-3"
       />
       <p class="text-neutral-600 font-medium">Cette balade est terminée</p>
@@ -329,7 +330,7 @@ useSeoMeta({
           variant="soft"
           color="neutral"
           size="sm"
-          icon="i-heroicons-x-mark"
+          icon="i-lucide-x"
           @click="promptCancelWalk"
         >
           Annuler
@@ -340,7 +341,7 @@ useSeoMeta({
           v-if="routeData"
           class="bg-white/90 backdrop-blur px-3 py-1.5 rounded-full shadow-sm"
         >
-          <span class="text-sm font-medium text-neutral-700">
+          <span class="text-sm font-medium text-forest-700">
             {{ routeData.name }}
           </span>
         </div>
@@ -365,7 +366,7 @@ useSeoMeta({
           class="absolute top-20 left-4 right-4 bg-warning/90 text-white px-4 py-2 rounded-lg text-sm"
         >
           <div class="flex items-center gap-2">
-            <UIcon name="i-heroicons-exclamation-triangle" class="w-4 h-4" />
+            <UIcon name="i-lucide-alert-triangle" class="w-4 h-4" />
             {{ trackingError }}
           </div>
         </div>
@@ -377,13 +378,13 @@ useSeoMeta({
         >
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-cloud-arrow-down" class="w-5 h-5" />
+              <UIcon name="i-lucide-cloud-rain" class="w-5 h-5" />
               <span class="text-sm font-medium">{{ walkWeather?.description || 'Météo dégradée' }}</span>
             </div>
             <UButton
               variant="ghost"
               size="xs"
-              icon="i-heroicons-x-mark"
+              icon="i-lucide-x"
               class="text-white"
               @click="weatherAlertDismissed = true"
             />
@@ -397,13 +398,13 @@ useSeoMeta({
         >
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-arrow-uturn-left" class="w-5 h-5" />
+              <UIcon name="i-lucide-undo-2" class="w-5 h-5" />
               <span class="text-sm">Tu sembles t'éloigner du parcours</span>
             </div>
             <UButton
               variant="ghost"
               size="xs"
-              icon="i-heroicons-x-mark"
+              icon="i-lucide-x"
               class="text-white"
               @click="dismissDeviationAlert"
             />
@@ -415,13 +416,13 @@ useSeoMeta({
           v-if="!isOnline"
           class="absolute top-20 right-4 bg-neutral-800/80 text-white px-3 py-1.5 rounded-full text-xs flex items-center gap-1"
         >
-          <UIcon name="i-heroicons-signal-slash" class="w-3 h-3" />
+          <UIcon name="i-lucide-wifi-off" class="w-3 h-3" />
           Mode hors-ligne
         </div>
       </div>
 
       <!-- Bottom Panel -->
-      <div class="bg-white border-t border-neutral-200 p-4 pb-safe">
+      <div class="bg-white border-t border-neutral-200 p-4 pb-safe" role="region" aria-label="Statistiques de balade">
         <!-- Stats Row -->
         <div class="flex items-center justify-around mb-4">
           <!-- Time Elapsed -->
@@ -448,7 +449,7 @@ useSeoMeta({
 
           <!-- Remaining Time -->
           <div class="text-center">
-            <div class="text-3xl font-bold text-primary tabular-nums">
+            <div class="text-3xl font-bold text-spring-500 tabular-nums">
               {{ remainingMinutes !== null ? `${remainingMinutes}` : '--' }}
             </div>
             <div class="text-xs text-neutral-500 uppercase tracking-wide">Min restantes</div>
@@ -460,12 +461,12 @@ useSeoMeta({
           block
           color="primary"
           size="lg"
-          class="text-lg font-semibold"
+          class="text-lg font-semibold min-h-[48px] bg-spring-500 hover:bg-spring-600"
           :loading="isFinishing"
           :disabled="isFinishing"
           @click="handleFinishWalk"
         >
-          <UIcon v-if="!isFinishing" name="i-heroicons-flag" class="w-5 h-5 mr-2" />
+          <UIcon v-if="!isFinishing" name="i-lucide-flag" class="w-5 h-5 mr-2" />
           {{ isFinishing ? 'Enregistrement...' : 'Terminer la balade' }}
         </UButton>
       </div>
@@ -481,7 +482,7 @@ useSeoMeta({
         <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-4">
           <div class="text-center">
             <div class="w-12 h-12 bg-error/10 rounded-full flex items-center justify-center mx-auto mb-3">
-              <UIcon name="i-heroicons-exclamation-triangle" class="w-6 h-6 text-error" />
+              <UIcon name="i-lucide-alert-triangle" class="w-6 h-6 text-error" />
             </div>
             <h3 class="text-lg font-semibold text-neutral-900">Annuler la balade ?</h3>
             <p class="text-sm text-neutral-500 mt-1">Ta progression ne sera pas enregistrée.</p>

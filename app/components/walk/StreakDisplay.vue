@@ -41,12 +41,12 @@ const streakMessage = computed(() => {
     <div class="flex items-center gap-3">
       <span class="text-2xl animate-bounce-subtle">🔥</span>
       <div class="flex-1">
-        <p class="text-lg font-bold text-neutral-900">{{ streakMessage }}</p>
+        <p class="text-lg font-bold text-forest-700">{{ streakMessage }}</p>
         <p v-if="data && data.streak === 0" class="text-sm text-neutral-500">Lance une balade pour commencer !</p>
         <p v-else-if="data && data.streak > 0" class="text-sm text-neutral-500">Streak consécutif</p>
       </div>
       <UIcon
-        :name="expanded ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+        :name="expanded ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
         class="w-5 h-5 text-neutral-400"
       />
     </div>
@@ -66,7 +66,7 @@ const streakMessage = computed(() => {
           <div
             :class="[
               'w-8 h-8 rounded-full flex items-center justify-center',
-              active ? 'bg-primary text-white' : 'bg-neutral-100 text-neutral-400',
+              active ? 'bg-spring-500 text-white' : 'bg-neutral-100 text-neutral-400',
             ]"
           >
             <span v-if="active" class="text-sm">✓</span>

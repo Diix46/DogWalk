@@ -21,12 +21,12 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const conditionIcons: Record<WeatherCondition, string> = {
-  sunny: 'i-heroicons-sun',
-  cloudy: 'i-heroicons-cloud',
-  rainy: 'i-heroicons-cloud-arrow-down',
-  stormy: 'i-heroicons-bolt',
-  snowy: 'i-heroicons-sparkles',
-  foggy: 'i-heroicons-eye-slash',
+  sunny: 'i-lucide-sun',
+  cloudy: 'i-lucide-cloud',
+  rainy: 'i-lucide-cloud-rain',
+  stormy: 'i-lucide-cloud-lightning',
+  snowy: 'i-lucide-snowflake',
+  foggy: 'i-lucide-cloud-fog',
 }
 
 const conditionColors: Record<WeatherCondition, string> = {
@@ -68,7 +68,7 @@ const visibleEntries = computed(() => {
         class="flex flex-col items-center gap-1 min-w-[3.5rem]"
       >
         <UIcon
-          :name="conditionIcons[entry.condition] || 'i-heroicons-cloud'"
+          :name="conditionIcons[entry.condition] || 'i-lucide-cloud'"
           :class="['w-7 h-7', conditionColors[entry.condition] || 'text-neutral-400']"
         />
         <span class="text-xs font-semibold text-neutral-800">{{ Math.round(entry.temperature) }}°</span>

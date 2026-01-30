@@ -123,7 +123,7 @@ async function handleStartWalk() {
     toast.add({
       title: 'Connexion requise',
       description: 'Connecte-toi pour démarrer une balade.',
-      icon: 'i-heroicons-user',
+      icon: 'i-lucide-user',
       color: 'warning',
     })
     await navigateTo('/login')
@@ -153,7 +153,7 @@ async function handleStartWalk() {
       toast.add({
         title: 'Connexion requise',
         description: 'Connecte-toi pour démarrer une balade.',
-        icon: 'i-heroicons-user',
+        icon: 'i-lucide-user',
         color: 'warning',
       })
       await navigateTo('/login')
@@ -164,7 +164,7 @@ async function handleStartWalk() {
     toast.add({
       title: 'Impossible de démarrer la balade',
       description: 'Réessaie dans quelques instants.',
-      icon: 'i-heroicons-exclamation-triangle',
+      icon: 'i-lucide-alert-triangle',
       color: 'error',
     })
   }
@@ -190,8 +190,8 @@ useSeoMeta({
     <!-- Loading State -->
     <div v-if="isLoading" class="flex flex-col items-center justify-center py-16">
       <UIcon
-        name="i-heroicons-arrow-path"
-        class="w-8 h-8 text-primary animate-spin mb-3"
+        name="i-lucide-loader-2"
+        class="w-8 h-8 text-spring-500 animate-spin mb-3"
       />
       <p class="text-neutral-600">Chargement du parcours...</p>
     </div>
@@ -199,7 +199,7 @@ useSeoMeta({
     <!-- Error State -->
     <div v-else-if="error" class="flex flex-col items-center justify-center py-16">
       <UIcon
-        name="i-heroicons-exclamation-triangle"
+        name="i-lucide-alert-triangle"
         class="w-12 h-12 text-warning mb-3"
       />
       <p class="text-neutral-600 font-medium">Parcours introuvable</p>
@@ -220,20 +220,20 @@ useSeoMeta({
         <UButton
           to="/explore"
           variant="ghost"
-          icon="i-heroicons-arrow-left"
+          icon="i-lucide-arrow-left"
           aria-label="Retour"
         />
         <div class="flex-1">
-          <h1 class="text-2xl font-bold text-neutral-900 line-clamp-2">
+          <h1 class="text-2xl font-bold text-forest-700 line-clamp-2">
             {{ routeData.name }}
           </h1>
         </div>
         <!-- Premium badge -->
         <span
           v-if="routeData.is_premium"
-          class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary text-xs font-medium"
+          class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-spring-500/10 text-spring-500 text-xs font-medium"
         >
-          <UIcon name="i-heroicons-star-solid" class="w-3 h-3" />
+          <UIcon name="i-lucide-star" class="w-3 h-3" />
           Premium
         </span>
       </div>
@@ -264,13 +264,13 @@ useSeoMeta({
         <div class="flex items-center gap-4 flex-wrap">
           <!-- Duration -->
           <div class="flex items-center gap-2 text-neutral-700">
-            <UIcon name="i-heroicons-clock" class="w-5 h-5 text-neutral-500" />
+            <UIcon name="i-lucide-clock" class="w-5 h-5 text-neutral-500" />
             <span class="font-medium">{{ formatDuration(routeData.duration_minutes) }}</span>
           </div>
 
           <!-- Distance -->
           <div class="flex items-center gap-2 text-neutral-700">
-            <UIcon name="i-heroicons-map-pin" class="w-5 h-5 text-neutral-500" />
+            <UIcon name="i-lucide-map-pin" class="w-5 h-5 text-neutral-500" />
             <span class="font-medium">{{ formatDistance(routeData.distance_meters) }}</span>
           </div>
 
@@ -309,24 +309,35 @@ useSeoMeta({
       <!-- Reviews Section -->
       <section v-if="reviewData && reviewData.stats.count > 0" class="space-y-4">
         <div class="flex items-center justify-between">
-          <h3 class="font-semibold text-neutral-900">Avis de la communauté</h3>
+          <h3 class="font-semibold text-forest-700">Avis de la communauté</h3>
           <div class="flex items-center gap-1 text-sm">
-            <span class="text-yellow-400 text-lg">★</span>
+            <UIcon name="i-lucide-star" class="w-5 h-5 text-yellow-400 fill-yellow-400" />
             <span class="font-bold">{{ reviewData.stats.avgRating }}</span>
-            <span class="text-neutral-500">({{ reviewData.stats.count }})</span>
+            <span class="text-neutral-500">({{ reviewData.stats.count }} avis)</span>
           </div>
         </div>
         <div class="space-y-3">
           <div
             v-for="review in reviewData.reviews.slice(0, 5)"
             :key="review.id"
-            class="bg-neutral-50 rounded-lg p-3"
+            class="bg-warmGray-50 rounded-lg p-3"
           >
             <div class="flex items-center justify-between mb-1">
               <span class="text-sm font-medium text-neutral-700">{{ review.user_name || 'Anonyme' }}</span>
-              <span class="text-yellow-400 text-sm">{{ '★'.repeat(review.rating) }}{{ '☆'.repeat(5 - review.rating) }}</span>
+              <div class="flex items-center gap-0.5">
+                <UIcon
+                  v-for="s in 5"
+                  :key="s"
+                  name="i-lucide-star"
+                  class="w-4 h-4"
+                  :class="s <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-neutral-300'"
+                />
+              </div>
             </div>
             <p v-if="review.comment" class="text-sm text-neutral-600">{{ review.comment }}</p>
+            <p class="text-xs text-neutral-400 mt-1">
+              {{ new Date(review.created_at * 1000).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) }}
+            </p>
           </div>
         </div>
       </section>
@@ -336,19 +347,19 @@ useSeoMeta({
         <h3 class="font-semibold text-neutral-900">Informations</h3>
         <ul class="text-sm text-neutral-600 space-y-2">
           <li class="flex items-center gap-2">
-            <UIcon name="i-heroicons-check-circle" class="w-4 h-4 text-success" />
+            <UIcon name="i-lucide-check-circle" class="w-4 h-4 text-success" />
             Parcours vérifié et sécurisé
           </li>
           <li class="flex items-center gap-2">
-            <UIcon name="i-heroicons-map" class="w-4 h-4 text-primary" />
+            <UIcon name="i-lucide-map" class="w-4 h-4 text-spring-500" />
             Suivi GPS disponible pendant la balade
           </li>
           <li v-if="routeData.type === 'nature'" class="flex items-center gap-2">
-            <UIcon name="i-heroicons-sparkles" class="w-4 h-4 text-success" />
+            <UIcon name="i-lucide-sparkles" class="w-4 h-4 text-success" />
             Parcours en pleine nature
           </li>
           <li v-if="routeData.type === 'urban'" class="flex items-center gap-2">
-            <UIcon name="i-heroicons-building-office-2" class="w-4 h-4 text-primary" />
+            <UIcon name="i-lucide-building-2" class="w-4 h-4 text-spring-500" />
             Parcours urbain bien aménagé
           </li>
         </ul>
@@ -365,14 +376,14 @@ useSeoMeta({
         <div v-if="canStart" class="flex items-center gap-3">
           <WeatherBadge v-if="weather || weatherLoading" :weather="weather" variant="compact" :lat="routeData?.center_lat ?? 43.5185" :lng="routeData?.center_lng ?? 1.3370" />
           <UButton
-            class="flex-1 text-lg font-semibold"
-            color="primary"
+            class="flex-1 text-lg font-semibold bg-spring-500 hover:bg-spring-600 text-white"
+            color="neutral"
             size="lg"
             :loading="isStartingWalk"
             :disabled="isStartingWalk"
             @click="handleStartWalk"
           >
-            <UIcon v-if="!isStartingWalk" name="i-heroicons-play" class="w-5 h-5 mr-2" />
+            <UIcon v-if="!isStartingWalk" name="i-lucide-play" class="w-5 h-5 mr-2" />
             {{ isStartingWalk ? 'Démarrage...' : "C'est parti !" }}
           </UButton>
         </div>
@@ -389,7 +400,7 @@ useSeoMeta({
             variant="outline"
             size="lg"
           >
-            <UIcon name="i-heroicons-star" class="w-5 h-5 mr-2" />
+            <UIcon name="i-lucide-star" class="w-5 h-5 mr-2" />
             Passer à Premium
           </UButton>
         </div>

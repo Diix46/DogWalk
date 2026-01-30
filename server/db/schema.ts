@@ -5,6 +5,7 @@ export const users = sqliteTable('users', {
   email: text('email').notNull().unique(),
   password_hash: text('password_hash').notNull(),
   name: text('name'),
+  username: text('username').unique(),
   streak_count: integer('streak_count').notNull().default(0),
   last_walk_date: text('last_walk_date'), // YYYY-MM-DD
   is_premium: integer('is_premium', { mode: 'boolean' }).notNull().default(false),

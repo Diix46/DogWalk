@@ -2,21 +2,22 @@ import { z } from 'zod'
 import { users } from '../../db/schema'
 import { createPasswordHash } from '../../utils/password'
 
-// Stricter email validation with TLD requirement (fixes M2)
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
 const registerSchema = z.object({
+  username: z.string()
+    .min(3, 'Le username doit contenir au moins 3 caractères')
+    .max(30, 'Le username ne doit pas dépasser 30 caractères')
+    .regex(/^[a-zA-Z0-9_-]+$/, 'Le username ne peut contenir que des lettres, chiffres, _ et -'),
   email: z.string()
     .email('Email invalide')
     .refine(val => emailRegex.test(val), 'Email invalide (domaine requis)'),
   password: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères'),
-  name: z.string().optional(),
 })
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
 
-  // Validate input
   const result = registerSchema.safeParse(body)
   if (!result.success) {
     const firstIssue = result.error.issues[0]
@@ -26,44 +27,28 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { email, password, name } = result.data
-
-  // Normalize email to prevent case-sensitive duplicates (fixes H1)
+  const { username, email, password } = result.data
   const normalizedEmail = email.toLowerCase().trim()
+  const normalizedUsername = username.trim()
 
-  // Hash password before insert
   const passwordHash = await createPasswordHash(password)
 
-  // Insert with race-condition safe duplicate handling (fixes H2)
-  // Instead of check-then-insert, we try to insert and catch UNIQUE constraint error
   try {
     const db = useDB()
     const [newUser] = await db.insert(users).values({
       email: normalizedEmail,
+      username: normalizedUsername,
       password_hash: passwordHash,
-      name: name || null,
     }).returning()
 
-    // Create session (nuxt-auth-utils) — include is_premium & is_admin like login
-    await setUserSession(event, {
-      user: {
-        id: newUser.id,
-        email: newUser.email,
-        name: newUser.name,
-        is_premium: false,
-        is_admin: false,
-      },
-    })
-
-    // Return user data (without password_hash)
+    // No auto-login — return success, client redirects to /login
     return {
       id: newUser.id,
       email: newUser.email,
-      name: newUser.name,
+      username: newUser.username,
     }
   }
   catch (error: unknown) {
-    // Handle UNIQUE constraint violation (email already exists)
     const errorMessage = error instanceof Error ? error.message : String(error)
     if (
       errorMessage.includes('UNIQUE constraint failed')
@@ -72,16 +57,21 @@ export default defineEventHandler(async (event) => {
       || errorMessage.includes('already exists')
       || errorMessage.includes('duplicate')
     ) {
+      // Determine which field caused the conflict
+      if (errorMessage.includes('username') || errorMessage.includes('idx_users_username')) {
+        throw createError({
+          statusCode: 409,
+          statusMessage: 'Ce username est déjà pris',
+        })
+      }
       throw createError({
         statusCode: 409,
         statusMessage: 'Cet email est déjà utilisé',
       })
     }
-    // Re-throw as proper HTTP error to avoid generic 500
     throw createError({
       statusCode: 500,
       statusMessage: 'Erreur lors de la création du compte',
-      message: errorMessage,
     })
   }
 })

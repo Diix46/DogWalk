@@ -30,10 +30,10 @@ const isEmpty = computed(() => !isLoading.value && (!walks.value || walks.value.
       <UButton
         to="/profile"
         variant="ghost"
-        icon="i-heroicons-arrow-left"
+        icon="i-lucide-arrow-left"
         aria-label="Retour"
       />
-      <h1 class="text-2xl font-bold text-neutral-900">Mon historique</h1>
+      <h1 class="text-2xl font-bold text-forest-700">Mon historique</h1>
     </div>
 
     <!-- Loading -->
@@ -62,7 +62,7 @@ const isEmpty = computed(() => !isLoading.value && (!walks.value || walks.value.
       </div>
       <h2 class="text-lg font-semibold text-neutral-900 mb-2">Ton historique apparaîtra ici</h2>
       <p class="text-neutral-500 mb-6">Lance ta première balade pour commencer !</p>
-      <UButton to="/explore" icon="i-heroicons-magnifying-glass">
+      <UButton to="/explore" icon="i-lucide-search">
         Trouver un parcours
       </UButton>
     </div>

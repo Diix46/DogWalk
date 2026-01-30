@@ -23,16 +23,16 @@ if (!article.value) {
 }
 
 const categories: Record<string, { label: string; icon: string }> = {
-  sante: { label: 'Santé', icon: 'i-heroicons-heart' },
-  nutrition: { label: 'Nutrition', icon: 'i-heroicons-cake' },
-  comportement: { label: 'Comportement', icon: 'i-heroicons-academic-cap' },
-  equipement: { label: 'Équipement', icon: 'i-heroicons-wrench-screwdriver' },
-  races: { label: 'Races', icon: 'i-heroicons-identification' },
+  sante: { label: 'Santé', icon: 'i-lucide-heart' },
+  nutrition: { label: 'Nutrition', icon: 'i-lucide-cake' },
+  comportement: { label: 'Comportement', icon: 'i-lucide-graduation-cap' },
+  equipement: { label: 'Équipement', icon: 'i-lucide-wrench' },
+  races: { label: 'Races', icon: 'i-lucide-id-card' },
 }
 
 const categoryConfig = computed(() => {
-  if (!article.value) return { label: '', icon: 'i-heroicons-tag' }
-  return categories[article.value.category] || { label: article.value.category, icon: 'i-heroicons-tag' }
+  if (!article.value) return { label: '', icon: 'i-lucide-tag' }
+  return categories[article.value.category] || { label: article.value.category, icon: 'i-lucide-tag' }
 })
 
 function formatDate(dateStr: string): string {
@@ -65,7 +65,7 @@ useSeoMeta({
     <UButton
       to="/articles"
       variant="ghost"
-      icon="i-heroicons-arrow-left"
+      icon="i-lucide-arrow-left"
     >
       Tous les articles
     </UButton>
@@ -74,14 +74,14 @@ useSeoMeta({
       <!-- Header -->
       <header class="space-y-3">
         <div class="flex items-center gap-2 text-sm text-neutral-500">
-          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-spring-500/10 text-spring-600 font-medium">
             <UIcon :name="categoryConfig.icon" class="w-3 h-3" />
             {{ categoryConfig.label }}
           </span>
           <span>{{ formatDate(article.publishedAt) }}</span>
         </div>
 
-        <h1 class="text-3xl font-bold text-neutral-900">
+        <h1 class="text-3xl font-bold text-forest-700">
           {{ article.title }}
         </h1>
 
@@ -111,10 +111,10 @@ useSeoMeta({
         <NuxtLink
           v-if="surround[0]"
           :to="surround[0].path"
-          class="flex-1 group p-4 rounded-lg border border-neutral-200 hover:border-primary/50 transition-colors"
+          class="flex-1 group p-4 rounded-lg border border-neutral-200 hover:border-spring-500/50 transition-colors"
         >
           <div class="text-xs text-neutral-500 mb-1">Article précédent</div>
-          <div class="font-medium text-neutral-900 group-hover:text-primary transition-colors">
+          <div class="font-medium text-forest-700 group-hover:text-spring-500 transition-colors">
             {{ surround[0].title }}
           </div>
         </NuxtLink>
@@ -123,10 +123,10 @@ useSeoMeta({
         <NuxtLink
           v-if="surround[1]"
           :to="surround[1].path"
-          class="flex-1 group p-4 rounded-lg border border-neutral-200 hover:border-primary/50 transition-colors text-right"
+          class="flex-1 group p-4 rounded-lg border border-neutral-200 hover:border-spring-500/50 transition-colors text-right"
         >
           <div class="text-xs text-neutral-500 mb-1">Article suivant</div>
-          <div class="font-medium text-neutral-900 group-hover:text-primary transition-colors">
+          <div class="font-medium text-forest-700 group-hover:text-spring-500 transition-colors">
             {{ surround[1].title }}
           </div>
         </NuxtLink>

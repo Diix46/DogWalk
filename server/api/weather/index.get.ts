@@ -30,7 +30,7 @@ export default defineCachedEventHandler(async (event) => {
     }
   }
 }, {
-  maxAge: 60 * 15, // 15 minutes
+  maxAge: 60 * 60, // 1 hour (NFR22)
   getKey: (event) => {
     const query = getQuery(event)
     const lat = Number(query.lat || 0).toFixed(2)

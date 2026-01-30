@@ -48,7 +48,7 @@ const formattedDistance = computed(() => {
         <p class="text-sm font-medium text-neutral-700">{{ formattedDuration }}</p>
         <p class="text-xs text-neutral-500">{{ formattedDistance }}</p>
       </div>
-      <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-neutral-400 shrink-0" />
+      <UIcon name="i-lucide-chevron-right" class="w-4 h-4 text-neutral-400 shrink-0" />
     </div>
   </NuxtLink>
 </template>

@@ -113,7 +113,7 @@ async function submitReview() {
       },
     })
     reviewSubmitted.value = true
-    toast.add({ title: 'Merci pour ton avis !', icon: 'i-heroicons-star', color: 'success' })
+    toast.add({ title: 'Merci pour ton avis !', icon: 'i-lucide-check-circle', color: 'success' })
   }
   catch {
     toast.add({ title: 'Erreur lors de l\'envoi', color: 'error' })
@@ -138,6 +138,7 @@ onMounted(() => {
 // Page meta
 definePageMeta({
   layout: 'default',
+  middleware: 'auth',
 })
 
 useSeoMeta({
@@ -146,7 +147,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
+  <div class="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden bg-warmGray-50">
     <!-- Confetti Animation Background -->
     <div
       v-if="showConfetti"
@@ -168,7 +169,7 @@ useSeoMeta({
     <!-- Error State -->
     <div v-if="walkError" class="text-center">
       <UIcon
-        name="i-heroicons-exclamation-triangle"
+        name="i-lucide-alert-triangle"
         class="w-12 h-12 text-warning mb-3"
       />
       <p class="text-neutral-600 font-medium">Balade introuvable</p>
@@ -187,7 +188,7 @@ useSeoMeta({
       <div class="relative inline-block">
         <div class="w-24 h-24 bg-success/10 rounded-full flex items-center justify-center animate-bounce-subtle">
           <UIcon
-            name="i-heroicons-check-circle"
+            name="i-lucide-check-circle"
             class="w-16 h-16 text-success"
           />
         </div>
@@ -195,7 +196,7 @@ useSeoMeta({
 
       <!-- Encouraging Message -->
       <div>
-        <h1 class="text-3xl font-bold text-neutral-900 mb-2">
+        <h1 class="text-3xl font-bold text-forest-700 mb-2">
           {{ encouragingMessage }}
         </h1>
         <p v-if="routeData" class="text-neutral-600">
@@ -207,7 +208,7 @@ useSeoMeta({
       <div class="grid grid-cols-2 gap-4">
         <!-- Duration -->
         <div class="bg-neutral-50 rounded-xl p-4">
-          <UIcon name="i-heroicons-clock" class="w-6 h-6 text-primary mx-auto mb-2" />
+          <UIcon name="i-lucide-clock" class="w-6 h-6 text-spring-500 mx-auto mb-2" />
           <div class="text-2xl font-bold text-neutral-900">
             {{ formatDuration(walkData.duration_seconds) }}
           </div>
@@ -216,7 +217,7 @@ useSeoMeta({
 
         <!-- Distance -->
         <div class="bg-neutral-50 rounded-xl p-4">
-          <UIcon name="i-heroicons-map-pin" class="w-6 h-6 text-primary mx-auto mb-2" />
+          <UIcon name="i-lucide-map-pin" class="w-6 h-6 text-spring-500 mx-auto mb-2" />
           <div class="text-2xl font-bold text-neutral-900">
             {{ formatDistance(walkData.distance_meters) }}
           </div>
@@ -235,17 +236,21 @@ useSeoMeta({
 
       <!-- Review Section -->
       <div v-if="!reviewSubmitted" class="bg-neutral-50 rounded-xl p-4 text-left space-y-3">
-        <h3 class="font-semibold text-neutral-900 text-center">Note cette balade</h3>
+        <h3 class="font-semibold text-forest-700 text-center">Note cette balade</h3>
         <div class="flex justify-center gap-2">
           <button
             v-for="star in 5"
             :key="star"
             type="button"
-            class="text-3xl transition-transform hover:scale-110"
-            :class="star <= reviewRating ? 'text-yellow-400' : 'text-neutral-300'"
+            class="transition-transform hover:scale-110"
+            :aria-label="`${star} étoile${star > 1 ? 's' : ''}`"
             @click="reviewRating = star"
           >
-            ★
+            <UIcon
+              name="i-lucide-star"
+              class="w-8 h-8"
+              :class="star <= reviewRating ? 'text-yellow-400 fill-yellow-400' : 'text-neutral-300'"
+            />
           </button>
         </div>
         <UTextarea
@@ -264,30 +269,30 @@ useSeoMeta({
         </UButton>
       </div>
       <div v-else class="bg-success/10 rounded-xl p-4 text-center">
-        <UIcon name="i-heroicons-check-circle" class="w-6 h-6 text-success mx-auto mb-1" />
+        <UIcon name="i-lucide-check-circle" class="w-6 h-6 text-success mx-auto mb-1" />
         <p class="text-sm text-success font-medium">Merci pour ton avis !</p>
       </div>
 
       <!-- Action Buttons -->
       <div class="space-y-3 pt-4">
         <UButton
-          to="/"
+          to="/explore"
           block
-          color="primary"
           size="lg"
+          class="bg-spring-500 hover:bg-spring-600 text-white min-h-[48px]"
         >
-          <UIcon name="i-heroicons-home" class="w-5 h-5 mr-2" />
-          Retour à l'accueil
+          <UIcon name="i-lucide-compass" class="w-5 h-5 mr-2" />
+          Retour
         </UButton>
 
         <UButton
-          to="/explore"
+          to="/"
           block
           variant="outline"
           size="lg"
         >
-          <UIcon name="i-heroicons-magnifying-glass" class="w-5 h-5 mr-2" />
-          Nouvelle balade
+          <UIcon name="i-lucide-home" class="w-5 h-5 mr-2" />
+          Retour à l'accueil
         </UButton>
       </div>
     </div>
@@ -295,7 +300,7 @@ useSeoMeta({
     <!-- Loading State -->
     <div v-else class="text-center">
       <UIcon
-        name="i-heroicons-arrow-path"
+        name="i-lucide-loader-2"
         class="w-8 h-8 text-primary animate-spin mb-3"
       />
       <p class="text-neutral-600">Chargement...</p>
